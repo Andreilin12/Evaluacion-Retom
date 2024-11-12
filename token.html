@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Token</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #token-display {
+            font-size: 2em;
+            margin-bottom: 10px;
+            color: #00ff6a;
+            letter-spacing: 0.15em;
+            font-weight: bold;
+            text-shadow: 0 0 8px #00ff6a, 0 0 12px #00ff6a;
+            background: #222;
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 255, 106, 0.3);
+        }
+        #timer-display {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            color: #16e086;
+        }
+        .icon-button {
+            background: none;
+            border: none;
+            color: #00d4ff;
+            font-size: 1.8em;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .icon-button:hover {
+            color: #007a99;
+        }
+    </style>
+</head>
+<body>
+    <h1>Generador de Token</h1>
+    <div id="token-display">Generando token...</div>
+    <div id="timer-display">Tiempo restante: 60s</div>
+    <button id="copy-button" class="icon-button" title="Copiar Token">
+        <i class="fas fa-copy"></i>
+    </button>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp, deleteDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBQZev4QZdClhi4LzdyPlOyJvkyQWRCiKU",
+            authDomain: "energycontador-20e7d.firebaseapp.com",
+            projectId: "energycontador-20e7d",
+            storageBucket: "energycontador-20e7d.appspot.com",
+            messagingSenderId: "216700307706",
+            appId: "1:216700307706:web:dedc278ff696be60662143"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        let currentToken = "";
+        let timer = 60;
+
+        // Función para generar un nuevo token
+        async function generateToken() {
+            currentToken = Math.floor(100000 + Math.random() * 900000).toString();
+            document.getElementById("token-display").textContent = currentToken;
+
+            // Guarda el token en Firebase
+            await addDoc(collection(db, "tokens"), {
+                token: currentToken,
+                timestamp: serverTimestamp(),
+                copied: false
+            });
+
+            // Elimina tokens viejos (más de 24 horas)
+            const now = Date.now();
+            const oldTokensQuery = query(collection(db, "tokens"), where("timestamp", "<", new Date(now - 24 * 60 * 60 * 1000)));
+            const oldTokensSnapshot = await getDocs(oldTokensQuery);
+            oldTokensSnapshot.forEach(async (doc) => {
+                await deleteDoc(doc.ref);
+            });
+
+            // Reinicia el temporizador después de generar el token
+            timer = 60;
+            document.getElementById("timer-display").textContent = `Tiempo restante: ${timer}s`;
+        }
+
+        // Función para actualizar el temporizador cada segundo
+        function startTimer() {
+            const interval = setInterval(() => {
+                if (timer > 0) {
+                    timer--;
+                    document.getElementById("timer-display").textContent = `Tiempo restante: ${timer}s`;
+                } else {
+                    clearInterval(interval); // Detiene el temporizador
+                    generateToken().then(() => startTimer()); // Genera un nuevo token y reinicia el temporizador
+                }
+            }, 1000);
+        }
+
+        // Función para copiar el token al portapapeles
+        document.getElementById("copy-button").addEventListener("click", async () => {
+            try {
+                await navigator.clipboard.writeText(currentToken);
+                alert("Token copiado al portapapeles.");
+            } catch (error) {
+                alert("Error al copiar el token.");
+            }
+        });
+
+        // Genera el primer token y comienza el temporizador
+        generateToken().then(startTimer);
+    </script>
+</body>
+</html>

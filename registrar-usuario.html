@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Usuario</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: none;
+            font-size: 1em;
+        }
+        button {
+            background-color: #00d4ff;
+            color: #0f0c29;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #007a99;
+        }
+    </style>
+</head>
+<body>
+    <h1>Registro de Usuario</h1>
+    <form id="registerForm">
+        <input type="text" id="username" placeholder="Nombre de usuario" required><br>
+        <input type="email" id="email" placeholder="Correo electrónico" required><br>
+        <button type="submit">Registrarse</button>
+    </form>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBQZev4QZdClhi4LzdyPlOyJvkyQWRCiKU",
+            authDomain: "energycontador-20e7d.firebaseapp.com",
+            projectId: "energycontador-20e7d",
+            storageBucket: "energycontador-20e7d.appspot.com",
+            messagingSenderId: "216700307706",
+            appId: "1:216700307706:web:dedc278ff696be60662143"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        document.getElementById("registerForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById("username").value;
+            const email = document.getElementById("email").value;
+
+            try {
+                await addDoc(collection(db, "users"), {
+                    username: username,
+                    email: email, 
+                    registeredAt: new Date()
+                });
+                alert("Usuario registrado con éxito.");
+                window.location.href = "token.html";
+            } catch (error) {
+                alert("Error al registrar usuario: " + error.message);
+            }
+        });
+    </script> 
+</body>
+</html>
