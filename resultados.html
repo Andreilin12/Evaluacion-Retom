@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados de Evaluación</title>
+    <style>
+        /* Estilos */
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 2.5em;
+            color: #00d4ff;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .search-bar {
+            margin-bottom: 20px;
+            width: 90%;
+            max-width: 600px;
+        }
+        .search-bar input {
+            width: 100%;
+            padding: 10px;
+            font-size: 1em;
+            border-radius: 5px;
+            border: none;
+            outline: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .result-card {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+        }
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        .approved {
+            color: #4caf50;
+            font-weight: bold;
+        }
+        .not-approved {
+            color: #ff4d4d;
+            font-weight: bold;
+        }
+        .question {
+            margin-top: 15px;
+        }
+        .answer {
+            margin-left: 20px;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+        .correct-answer {
+            color: #4caf50;
+        }
+        .incorrect-answer {
+            color: #ff4d4d;
+        }
+    </style>
+</head>
+<body>
+    <h1>Resultados de Evaluación</h1>
+    <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Buscar por nombre...">
+    </div>
+    <div id="results-container"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCFfkmEDjqAwJNtnKByRQNt9NUQs5UdNa0",
+            authDomain: "rrhh-ee7e3.firebaseapp.com",
+            projectId: "rrhh-ee7e3",
+            storageBucket: "rrhh-ee7e3.appspot.com",
+            messagingSenderId: "605891607617",
+            appId: "1:605891607617:web:daedbd7b7b5a8b901ac0",
+            measurementId: "G-Q801R9M95S"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const resultsContainer = document.getElementById("results-container");
+        const searchInput = document.getElementById("search-input");
+
+        // Función para obtener los resultados de Firestore
+        async function fetchResults() {
+            try {
+                const resultsSnapshot = await getDocs(collection(db, "results"));
+                const results = resultsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                console.log("Datos recuperados de Firestore:", results);
+                return results;
+            } catch (error) {
+                console.error("Error al obtener los datos de Firestore:", error);
+                return [];
+            }
+        }
+
+        // Función para mostrar los resultados
+        function displayResults(filteredResults) {
+            resultsContainer.innerHTML = "";
+            if (filteredResults.length === 0) {
+                resultsContainer.innerHTML = "<p>No se encontraron resultados.</p>";
+                return;
+            }
+            filteredResults.forEach(data => {
+                const { userName, percentage, responses } = data;
+                const isApproved = percentage >= 60 ? "Aprobado" : "No Aprobado";
+
+                const resultCard = document.createElement("div");
+                resultCard.classList.add("result-card");
+
+                const resultHeader = document.createElement("div");
+                resultHeader.classList.add("result-header");
+                resultHeader.innerHTML = `
+                    <span><strong>Nombre:</strong> ${userName}</span>
+                    <span><strong>Porcentaje:</strong> ${percentage}%</span>
+                    <span class="${isApproved === 'Aprobado' ? 'approved' : 'not-approved'}">${isApproved}</span>
+                `;
+                resultCard.appendChild(resultHeader);
+
+                responses.forEach((response, index) => {
+                    const questionElement = document.createElement("div");
+                    questionElement.classList.add("question");
+                    questionElement.innerHTML = `<strong>Pregunta ${index + 1}:</strong> ${response.question}`;
+
+                    const answerElement = document.createElement("div");
+                    answerElement.classList.add("answer", response.selectedAnswer === response.correctAnswer ? "correct-answer" : "incorrect-answer");
+                    answerElement.textContent = `Respuesta: ${response.selectedAnswer}`;
+
+                    questionElement.appendChild(answerElement);
+                    resultCard.appendChild(questionElement);
+                });
+
+                resultsContainer.appendChild(resultCard);
+            });
+        }
+
+        // Función para inicializar la aplicación y buscar resultados
+        async function init() {
+            const results = await fetchResults();
+
+            // Escuchar cambios en el input de búsqueda para filtrar los resultados
+            searchInput.addEventListener("input", () => {
+                const searchTerm = searchInput.value.toLowerCase();
+                const filteredResults = results.filter(result => 
+                    result.userName && result.userName.toLowerCase().includes(searchTerm)
+                );
+                displayResults(filteredResults);
+            });
+
+            // Mostrar todos los resultados al inicio
+            displayResults(results);
+        }
+
+        init();
+    </script>
+</body>
+</html>
