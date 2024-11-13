@@ -1,1 +1,277 @@
 
+<!DOCTYPE html>
+<html lang="es">
+<head> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario de Eventos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 20px;
+        }
+
+        #calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            grid-gap: 10px;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .calendar-header {
+            grid-column: span 7;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .day {
+            padding: 20px;
+            background-color: #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            position: relative;
+        }
+
+        .day:hover {
+            background-color: #00d4ff;
+        }
+
+        .current-day {
+            background-color: #ffeb3b;
+            font-weight: bold;
+        }
+
+        .event {
+            margin-top: 5px;
+            font-size: 0.8em;
+        }
+
+        .edit-day {
+            margin-top: 5px;
+            font-size: 0.8em;
+            cursor: pointer;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .edit-day:hover {
+            text-decoration: underline;
+        }
+
+        /* Estilos para el cuadro de edición */
+        .edit-form {
+            display: none;
+            margin-top: 20px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            max-width: 300px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .edit-form input,
+        .edit-form textarea,
+        .edit-form select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .edit-form button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        .edit-form button:hover {
+            background-color: #0056b3;
+        }
+
+        .edit-form .close-btn {
+            background-color: #f44336;
+        }
+
+        .edit-form .close-btn:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Calendario de Eventos</h1>
+
+    <div id="calendar"></div>
+
+    <div class="edit-form" id="editForm">
+        <h3>Editar Evento</h3>
+        <input type="text" id="eventDescription" placeholder="Descripción del evento">
+        <input type="color" id="eventColor" value="#ff0000">
+        <input type="url" id="eventSound" placeholder="Enlace de sonido del evento">
+        <button id="saveEvent">Guardar Evento</button>
+        <button class="close-btn" id="closeForm">Cerrar</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCFfkmEDjqAwJNtnKByRQNt9NUQs5UdNa0",
+            authDomain: "rrhh-ee7e3.firebaseapp.com",
+            projectId: "rrhh-ee7e3",
+            storageBucket: "rrhh-ee7e3.appspot.com",
+            messagingSenderId: "605891607617",
+            appId: "1:605891607617:web:daedbd7b7b5a8b901ac0",
+            measurementId: "G-Q801R9M95S"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let selectedDay = null;
+
+        // Función para mostrar el calendario del mes actual
+        function renderCalendar() {
+            const calendarElement = document.getElementById('calendar');
+            const date = new Date();
+            const currentMonth = date.getMonth();
+            const currentYear = date.getFullYear();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+
+            // Mostrar el año actual
+            const headerElement = document.createElement('div');
+            headerElement.classList.add('calendar-header');
+            headerElement.textContent = `Año ${currentYear}`;
+            calendarElement.appendChild(headerElement);
+
+            // Renderizar las iniciales de los días de la semana
+            const weekDays = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+            weekDays.forEach(day => {
+                const dayElement = document.createElement('div');
+                dayElement.textContent = day;
+                calendarElement.appendChild(dayElement);
+            });
+
+            // Limpiar el calendario antes de renderizar
+            calendarElement.innerHTML = '';
+
+            // Renderizar las celdas vacías antes del primer día del mes
+            for (let i = 0; i < firstDayOfMonth; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.classList.add('day');
+                calendarElement.appendChild(emptyCell);
+            }
+
+            // Renderizar los días del mes
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayElement = document.createElement('div');
+                dayElement.classList.add('day');
+                dayElement.textContent = i;
+                dayElement.id = `day-${i}`;
+
+                // Marcar el día actual
+                const today = new Date();
+                if (today.getDate() === i && today.getMonth() === currentMonth && today.getFullYear() === currentYear) {
+                    dayElement.classList.add('current-day');
+                }
+
+                // Obtener los eventos de Firebase
+                getEventData(i);
+
+                // Permitir editar el día
+                const editButton = document.createElement('div');
+                editButton.classList.add('edit-day');
+                editButton.textContent = 'Editar';
+                editButton.addEventListener('click', () => openEditForm(i));
+                dayElement.appendChild(editButton);
+
+                calendarElement.appendChild(dayElement);
+            }
+        }
+
+        // Función para obtener los datos del evento de Firebase
+        async function getEventData(day) {
+            const docRef = doc(db, "events", `${day}`);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                const eventData = docSnap.data();
+                const dayElement = document.getElementById(`day-${day}`);
+                const eventDiv = document.createElement('div');
+                eventDiv.classList.add('event');
+                eventDiv.textContent = eventData.description;
+                eventDiv.style.backgroundColor = eventData.color;
+                dayElement.appendChild(eventDiv);
+            }
+        }
+
+        // Función para abrir el formulario de edición
+        function openEditForm(day) {
+            selectedDay = day;
+            const editForm = document.getElementById('editForm');
+            const eventDescription = document.getElementById('eventDescription');
+            const eventColor = document.getElementById('eventColor');
+            const eventSound = document.getElementById('eventSound');
+
+            eventDescription.value = '';
+            eventColor.value = '#ff0000';
+            eventSound.value = '';
+
+            editForm.style.display = 'block';
+        }
+
+        // Función para cerrar el formulario de edición
+        document.getElementById('closeForm').addEventListener('click', () => {
+            document.getElementById('editForm').style.display = 'none';
+        });
+
+        // Función para guardar el evento editado
+        document.getElementById('saveEvent').addEventListener('click', async () => {
+            const eventDescription = document.getElementById('eventDescription').value;
+            const eventColor = document.getElementById('eventColor').value;
+            const eventSound = document.getElementById('eventSound').value;
+
+            // Guardar los datos en Firebase
+            await setDoc(doc(db, "events", `${selectedDay}`), {
+                description: eventDescription,
+                color: eventColor,
+                sound: eventSound
+            });
+
+            renderCalendar();
+            document.getElementById('editForm').style.display = 'none';
+        });
+
+        // Renderizar el calendario al cargar la página
+        renderCalendar();
+    </script>
+</body>
+</html>
