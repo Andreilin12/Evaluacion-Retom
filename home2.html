@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio de Sesión y Evaluación</title>
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        h1, h2 {
+            font-size: 2em;
+            color: #00d4ff;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-align: center;
+        }
+        .logo {
+            max-width: 150px;
+            margin-bottom: 20px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: none;
+            font-size: 1em;
+        }
+        button {
+            background-color: #00d4ff;
+            color: #0f0c29;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #007a99;
+        }
+        #quiz-container, #result-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            display: none;
+        }
+        .question {
+            text-align: left;
+            margin: 10px 0;
+        }
+        .answers button {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            font-size: 1.2em;
+            background-color: #1a1a1a;
+            color: #00d4ff;
+            border: 2px solid #00d4ff;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .answers button:hover {
+            background-color: #00d4ff;
+            color: #1a1a1a;
+        }
+        #loading {
+            display: none;
+            font-size: 1.5em;
+            color: #00d4ff;
+        }
+        #login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Contenedor de Bienvenida -->
+    <div id="welcome-container" style="display: none;">
+        <img src="logo.png" alt="Logo de la empresa" class="logo">
+        <h1>Bienvenido, <span id="user-name"></span>!</h1>
+        <button id="start-quiz" style="display: none;">Iniciar Evaluación</button>
+    </div>
+
+    <!-- Sesión de Inicio de Sesión -->
+    <div id="login-container">
+        <h1>Iniciar Sesión</h1>
+        <form id="loginForm" style="display: flex; flex-direction: column; align-items: center;">
+            <input type="email" id="email" placeholder="Correo electrónico" required style="margin-bottom: 10px; width: 80%;"><br>
+            <input type="text" id="token" placeholder="Token de acceso" required style="margin-bottom: 10px; width: 80%;"><br>
+            <button type="submit" style="width: 80%;">Iniciar Sesión</button>
+        </form>
+    </div>
+
+    <!-- Sesión de Evaluación -->
+    <div id="quiz-container">
+        <h2>Evaluación</h2>
+        <div id="question" class="question"></div>
+        <div id="answers" class="answers"></div>
+    </div>
+
+    <!-- Resultados -->
+    <div id="result-container">
+        <h2>Resultados</h2>
+        <p id="result-message"></p>
+        <p id="result-details"></p>
+        <button id="ok-button">OK</button>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loading">Cargando...</div>
+
+    <script type="module">
+        // Importa Firebase SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getFirestore, collection, query, where, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBQZev4QZdClhi4LzdyPlOyJvkyQWRCiKU",
+            authDomain: "energycontador-20e7d.firebaseapp.com",
+            databaseURL: "https://energycontador-20e7d-default-rtdb.firebaseio.com",
+            projectId: "energycontador-20e7d",
+            storageBucket: "energycontador-20e7d.appspot.com",
+            messagingSenderId: "216700307706",
+            appId: "1:216700307706:web:dedc278ff696be60662143"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Bloquear el retroceso en el navegador
+        window.history.pushState(null, null, window.location.href);
+        window.onpopstate = function () {
+            window.history.go(1);
+        };
+
+        // Maneja el inicio de sesión
+        document.getElementById("loginForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const email = document.getElementById("email").value;
+            const tokenInput = document.getElementById("token").value;
+
+            try {
+                const usersQuery = query(collection(db, "users"), where("email", "==", email));
+                const usersSnapshot = await getDocs(usersQuery);
+
+                if (usersSnapshot.empty) {
+                    alert("Usuario no registrado.");
+                    return;
+                }
+
+                const tokensQuery = query(collection(db, "tokens"), where("token", "==", tokenInput));
+                const tokensSnapshot = await getDocs(tokensQuery);
+
+                if (tokensSnapshot.empty) {
+                    alert("Token incorrecto o expirado.");
+                } else {
+                    const user = usersSnapshot.docs[0].data();
+                    document.getElementById("login-container").style.display = "none";
+                    document.getElementById("welcome-container").style.display = "block";
+                    document.getElementById("start-quiz").style.display = "block";
+                    document.getElementById("user-name").textContent = user.name; // Muestra el nombre del usuario
+                    sessionStorage.setItem("userEmail", email);
+                    sessionStorage.setItem("userName", user.name);
+                }
+            } catch (error) {
+                alert("Error al iniciar sesión: " + error.message);
+            }
+        });
+
+        // Preguntas de la evaluación
+        let questions = [
+            { question: "¿Cuál es la capital de Francia?", answers: ["París", "Londres", "Berlín", "Madrid"], correctAnswer: 0 },
+            { question: "¿Cuánto es 2 + 2?", answers: ["3", "4", "5", "6"], correctAnswer: 1 },
+            { question: "¿Cuál es el idioma oficial de Brasil?", answers: ["Portugués", "Español", "Inglés", "Francés"], correctAnswer: 0 }
+        ];
+
+        document.getElementById("start-quiz").addEventListener("click", () => {
+            document.getElementById("welcome-container").style.display = "none";
+            document.getElementById("quiz-container").style.display = "block";
+            showQuestion();
+        });
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answeredQuestions = [];
+
+        function showQuestion() {
+            const currentQuestion = questions[currentQuestionIndex];
+            document.getElementById("question").textContent = currentQuestion.question;
+            const answersElement = document.getElementById("answers");
+            answersElement.innerHTML = "";
+            currentQuestion.answers.forEach((answer, index) => {
+                const button = document.createElement("button");
+                button.textContent = answer;
+                button.onclick = () => selectAnswer(index);
+                answersElement.appendChild(button);
+            });
+        }
+
+        function selectAnswer(selectedAnswer) {
+            const currentQuestion = questions[currentQuestionIndex];
+            answeredQuestions.push({ question: currentQuestion.question, answer: currentQuestion.answers[selectedAnswer] });
+            if (selectedAnswer === currentQuestion.correctAnswer) {
+                score++;
+            }
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            const percentage = ((score / questions.length) * 100).toFixed(0); // Ajuste a dos dígitos
+            const status = percentage >= 60 ? "Aprobado" : "Reprobado";
+            const userName = sessionStorage.getItem("userName");
+            const userEmail = sessionStorage.getItem("userEmail");
+            const resultMessage = `Resultado: ${status}`;
+            const resultDetails = `Hola ${userName}, tu puntaje es de ${percentage}%.`;
+
+            document.getElementById("quiz-container").style.display = "none";
+            document.getElementById("result-container").style.display = "block";
+            document.getElementById("result-message").textContent = resultMessage;
+            document.getElementById("result-details").textContent = resultDetails;
+
+            addDoc(collection(db, "results"), {
+                user: { name: userName, email: userEmail },
+                score: percentage,
+                status: status,
+                date: new Date().toLocaleDateString()
+            }).then(() => console.log("Resultado guardado."));
+        }
+
+        document.getElementById("ok-button").addEventListener("click", () => {
+            sessionStorage.clear();
+            location.reload(); // Redirecciona al login
+        });
+    </script>
+</body>
+</html>
