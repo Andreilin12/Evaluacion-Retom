@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compartir Enlace</title>
+    <!-- Cargar FontAwesome desde CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         /* Estilo base */
         body {
@@ -88,10 +90,9 @@
             background-color: #00a48c;
         }
 
-        .share-buttons a img {
+        .share-buttons a i {
             margin-right: 10px;
-            width: 25px;
-            height: 25px;
+            font-size: 25px;
         }
 
         /* Estilo para el botón de copiar */
@@ -110,7 +111,7 @@
 
         .copy-button:hover {
             transform: translateY(-5px);
-            background-color: #16e086
+            background-color: #16e086;
         }
 
         /* Estilo para el mensaje de copia */
@@ -166,10 +167,16 @@
     
     <!-- Botones de compartir -->
     <div class="share-buttons">
-        <!-- WhatsApp -->
-        <a href="https://wa.me/?text=https://andreilin12.github.io/Evaluacion-Retom/evaluaciones.html" target="_blank">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
+        <!-- WhatsApp con icono de FontAwesome -->
+        <a href="https://wa.me/?text=https://acortar.link/2xJ5ce" target="_blank">
+            <i class="fab fa-whatsapp"></i>
             Compartir en WhatsApp
+        </a>
+
+        <!-- Nuevo icono para abrir página externa usando FontAwesome -->
+        <a href="https://andreilin12.github.io/Evaluacion-Retom/evaluaciones.html" target="_blank">
+            <i class="fas fa-link"></i>
+             Abrir en la web
         </a>
     </div>
 
