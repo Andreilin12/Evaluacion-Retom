@@ -129,7 +129,6 @@
         <p><i id="deviceIcon" class="fas"></i><strong>Dispositivo:</strong> <span id="deviceType"></span></p>
         <p><i class="fas fa-signal"></i><strong>Señal de Internet:</strong> <span id="signalLevel">Cargando...</span></p>
         <p><i class="fas fa-battery-full"></i><strong>Batería:</strong> <span id="batteryLevel">Cargando...</span></p>
-        <p><i class="fas fa-info-circle"></i><strong>Marca/Modelo:</strong> <span id="deviceModel">Cargando...</span></p>
     </div>
 
     <div class="instructions">
@@ -153,30 +152,25 @@
     function getDeviceType() {
         const userAgent = navigator.userAgent || navigator.vendor || window.opera;
 
-        let deviceInfo = { type: "Dispositivo desconocido", icon: "fa-question-circle", model: "Desconocido" };
-
-        // Detección para dispositivos móviles Android
+        // Detección para dispositivos móviles
         if (/android/i.test(userAgent)) {
-            deviceInfo = { type: "Móvil Android", icon: "fa-mobile-alt", model: "Modelo Android" };
+            return { type: "Móvil Android", icon: "fa-mobile-alt" };
         }
-        // Detección para dispositivos iPhone/iPad
         if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-            deviceInfo = { type: "iPhone/iPad", icon: "fa-mobile-alt", model: "Apple" };
+            return { type: "iPhone/iPad", icon: "fa-mobile-alt" };
         }
-        // Detección para PC Windows
+        // Detección para PC
         if (/Windows/i.test(userAgent)) {
-            deviceInfo = { type: "PC (Windows)", icon: "fa-desktop", model: "PC con Windows" };
+            return { type: "PC (Windows)", icon: "fa-desktop" };
         }
-        // Detección para PC Mac
         if (/Macintosh/i.test(userAgent)) {
-            deviceInfo = { type: "PC (Mac)", icon: "fa-desktop", model: "Mac" };
+            return { type: "PC (Mac)", icon: "fa-desktop" };
         }
         // Detección para tabletas
         if (/tablet/i.test(userAgent) || /iPad/i.test(userAgent)) {
-            deviceInfo = { type: "Tablet", icon: "fa-tablet-alt", model: "Tableta" };
+            return { type: "Tablet", icon: "fa-tablet-alt" };
         }
-
-        return deviceInfo;
+        return { type: "Dispositivo desconocido", icon: "fa-question-circle" };
     }
 
     // Detección de la señal de red
@@ -206,7 +200,6 @@
     const deviceInfo = getDeviceType();
     document.getElementById('deviceType').textContent = deviceInfo.type;
     document.getElementById('deviceIcon').classList.add("fas", deviceInfo.icon); // Añadir el icono al <i>
-    document.getElementById('deviceModel').textContent = deviceInfo.model;
 
     updateSignalLevel();
     updateBatteryLevel();
