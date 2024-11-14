@@ -168,7 +168,7 @@
                     document.getElementById("start-quiz").style.display = "block";
                     document.getElementById("user-name").textContent = user.username;
                     sessionStorage.setItem("token", tokenInput);
-                    sessionStorage.setItem("userName", user.name);
+                    sessionStorage.setItem("userName", user.username);
                 }
             } catch (error) {
                 alert("Error al iniciar sesión: " + error.message);
