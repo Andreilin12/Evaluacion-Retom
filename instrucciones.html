@@ -128,6 +128,7 @@
         <h3>Detalles de tu dispositivo</h3>
         <p><i id="deviceIcon" class="fas"></i><strong>Dispositivo:</strong> <span id="deviceType"></span></p>
         <p><i class="fas fa-signal"></i><strong>Señal de Internet:</strong> <span id="signalLevel">Cargando...</span></p>
+        <p><i class="fas fa-wifi"></i><strong>Red Wi-Fi:</strong> <span id="wifiNetwork">Cargando...</span></p>
         <p><i class="fas fa-battery-full"></i><strong>Batería:</strong> <span id="batteryLevel">Cargando...</span></p>
     </div>
 
@@ -176,10 +177,29 @@
     // Detección de la señal de red
     function updateSignalLevel() {
         if (navigator.connection) {
-            const signalStrength = navigator.connection.downlinkMax || 0;
-            document.getElementById('signalLevel').textContent = `${Math.round(signalStrength * 10)}%`;
+            const connection = navigator.connection;
+            const signalStrength = connection.downlinkMax || 0;
+            const type = connection.effectiveType;
+
+            document.getElementById('signalLevel').textContent = `${Math.round(signalStrength * 10)}% - Tipo: ${type}`;
         } else {
             document.getElementById('signalLevel').textContent = "Sin información";
+        }
+    }
+
+    // Detección de red Wi-Fi
+    function updateWifiNetwork() {
+        if (navigator.connection) {
+            const type = navigator.connection.type;
+            if (type === 'wifi') {
+                document.getElementById('wifiNetwork').textContent = 'Conectado a Wi-Fi';
+            } else if (type === 'cellular') {
+                document.getElementById('wifiNetwork').textContent = 'Conectado a datos móviles';
+            } else {
+                document.getElementById('wifiNetwork').textContent = 'Conectado por cable o sin red';
+            }
+        } else {
+            document.getElementById('wifiNetwork').textContent = "Sin información";
         }
     }
 
@@ -202,6 +222,7 @@
     document.getElementById('deviceIcon').classList.add("fas", deviceInfo.icon); // Añadir el icono al <i>
 
     updateSignalLevel();
+    updateWifiNetwork();
     updateBatteryLevel();
 </script>
 
