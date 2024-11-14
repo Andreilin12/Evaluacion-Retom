@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -16,7 +16,6 @@
             align-items: center;
             height: 100vh;
         }
-
         .container {
             background: rgba(44, 62, 80);
             border-radius: 15px;
@@ -27,20 +26,17 @@
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
             text-align: center;
         }
-
         h2 {
             font-size: 28px;
             margin-bottom: 20px;
             font-weight: bold;
             color: #f4f4f4;
         }
-
         .device-info {
             text-align: left;
             margin-bottom: 25px;
             font-size: 16px;
         }
-
         .device-info p {
             margin: 5px 0;
             color: #ddd;
@@ -49,28 +45,17 @@
             justify-content: center;
             font-size: 18px;
         }
-
         .device-info i {
             margin-right: 10px;
             font-size: 24px;
             color: #16e086;
         }
-
         .instructions {
             margin-top: 20px;
             text-align: left;
             font-size: 16px;
             margin-bottom: 25px;
         }
-
-        .instructions ul {
-            color: #fff;
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            font-size: 14px;
-        }
-
         .start-btn {
             background-color: #15a086;
             color: #fff;
@@ -82,17 +67,8 @@
             width: 100%;
             transition: background-color 0.3s ease;
         }
-
         .start-btn:hover {
             background-color: #16e086;
-        }
-
-        .start-btn i {
-            margin-right: 10px;
-        }
-
-        /* Futuristic hover effect */
-        .start-btn:hover {
             transform: scale(1.05);
             box-shadow: 0px 10px 15px rgba(127, 245, 194);
         }
@@ -102,17 +78,16 @@
 
 <div class="container">
     <h2>Instrucciones para la Evaluación</h2>
-
     <div class="device-info">
         <h3>Detalles de tu dispositivo</h3>
         <p><i id="deviceIcon" class="fas"></i><strong>Dispositivo:</strong> <span id="deviceType"></span></p>
-        <p><i class="fas fa-signal"></i><strong>Conectividad:</strong> <span id="networkInfo">Cargando...</span></p>
+        <p><i class="fas fa-signal"></i><strong>Señal de Internet:</strong> <span id="signalLevel">Cargando...</span></p>
+        <p><i class="fas fa-wifi"></i><strong>Red Wi-Fi:</strong> <span id="wifiNetwork">Cargando...</span></p>
+        <p><i class="fas fa-mobile-alt"></i><strong>Datos Móviles:</strong> <span id="mobileDataStatus">Cargando...</span></p>
         <p><i class="fas fa-battery-full"></i><strong>Batería:</strong> <span id="batteryLevel">Cargando...</span></p>
     </div>
-
     <div class="instructions">
         <h3>Antes de Iniciar</h3>
-        <p>Asegúrate de cumplir con los siguientes puntos para una mejor experiencia durante la evaluación:</p>
         <ul>
             <li>Confirma que tienes una conexión estable a Internet.</li>
             <li>Verifica que tu dispositivo tiene suficiente batería o está conectado a una fuente de energía.</li>
@@ -120,58 +95,60 @@
             <li>Lee cuidadosamente cada pregunta y asegúrate de estar seguro antes de seleccionar una respuesta, ya que no podrás regresar una vez que elijas.</li>
         </ul>
     </div>
-
     <button class="start-btn" onclick="window.location.href='evaluaciones.html'">
         <i class="fas fa-play"></i> Iniciar Evaluación
     </button>
 </div>
 
 <script>
-    // Detección del tipo de dispositivo
     function getDeviceType() {
         const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-
-        if (/android/i.test(userAgent)) {
-            return { type: "Móvil Android", icon: "fa-mobile-alt" };
-        }
-        if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-            return { type: "iPhone/iPad", icon: "fa-mobile-alt" };
-        }
-        if (/Windows/i.test(userAgent)) {
-            return { type: "PC (Windows)", icon: "fa-desktop" };
-        }
-        if (/Macintosh/i.test(userAgent)) {
-            return { type: "PC (Mac)", icon: "fa-desktop" };
-        }
-        if (/tablet/i.test(userAgent) || /iPad/i.test(userAgent)) {
-            return { type: "Tablet", icon: "fa-tablet-alt" };
-        }
+        if (/android/i.test(userAgent)) return { type: "Móvil Android", icon: "fa-mobile-alt" };
+        if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) return { type: "iPhone/iPad", icon: "fa-mobile-alt" };
+        if (/Windows/i.test(userAgent)) return { type: "PC (Windows)", icon: "fa-desktop" };
+        if (/Macintosh/i.test(userAgent)) return { type: "PC (Mac)", icon: "fa-desktop" };
+        if (/tablet/i.test(userAgent) || /iPad/i.test(userAgent)) return { type: "Tablet", icon: "fa-tablet-alt" };
         return { type: "Dispositivo desconocido", icon: "fa-question-circle" };
     }
 
-    // Detección de la conectividad
-    function updateNetworkInfo() {
+    function updateSignalLevel() {
         if (navigator.connection) {
             const connection = navigator.connection;
             const signalStrength = connection.downlinkMax || 0;
             const type = connection.effectiveType;
 
-            let connectivityStatus = `${Math.round(signalStrength * 10)}% - Tipo: ${type}`;
-            if (type === 'wifi') {
-                connectivityStatus += ' (Wi-Fi conectado)';
-            } else if (type === '4g' || type === '3g' || type === '2g') {
-                connectivityStatus += ' (Datos móviles activos)';
+            if (signalStrength > 0) {
+                document.getElementById('signalLevel').textContent = `${Math.round(signalStrength * 10)}% - Tipo: ${type}`;
             } else {
-                connectivityStatus += ' (Sin conexión)';
+                document.getElementById('signalLevel').textContent = "Sin señal detectada";
             }
-
-            document.getElementById('networkInfo').textContent = connectivityStatus;
         } else {
-            document.getElementById('networkInfo').textContent = "Sin información";
+            document.getElementById('signalLevel').textContent = "Sin información disponible";
         }
     }
 
-    // Detección de nivel de batería
+    function updateWifiNetwork() {
+        if (navigator.connection) {
+            const type = navigator.connection.type;
+            document.getElementById('wifiNetwork').textContent = type === 'wifi' ? 'Conectado a Wi-Fi' : 'No Wi-Fi Detectado';
+        } else {
+            document.getElementById('wifiNetwork').textContent = "Sin información";
+        }
+    }
+
+    function updateMobileData() {
+        if (navigator.connection) {
+            const type = navigator.connection.effectiveType;
+            if (type === '2g' || type === '3g' || type === '4g') {
+                document.getElementById('mobileDataStatus').textContent = `Datos móviles activados: ${type}`;
+            } else {
+                document.getElementById('mobileDataStatus').textContent = "Datos móviles desactivados";
+            }
+        } else {
+            document.getElementById('mobileDataStatus').textContent = "Sin información";
+        }
+    }
+
     async function updateBatteryLevel() {
         if (navigator.getBattery) {
             const battery = await navigator.getBattery();
@@ -184,19 +161,14 @@
         }
     }
 
-    // Asignar la información detectada
     const deviceInfo = getDeviceType();
     document.getElementById('deviceType').textContent = deviceInfo.type;
     document.getElementById('deviceIcon').classList.add("fas", deviceInfo.icon);
 
-    // Llamada a las funciones
-    updateNetworkInfo();
+    updateSignalLevel();
+    updateWifiNetwork();
+    updateMobileData();
     updateBatteryLevel();
-
-    // Actualización automática de la conectividad
-    if (navigator.connection) {
-        navigator.connection.addEventListener('change', updateNetworkInfo);
-    }
 </script>
 
 </body>
