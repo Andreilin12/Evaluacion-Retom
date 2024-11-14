@@ -181,10 +181,38 @@
         });
 
         let questions = [
-            { question: "¿Cuál es la capital de Francia?", answers: ["París", "Londres", "Berlín", "Madrid"], correctAnswer: 0 },
-            { question: "¿Cuánto es 2 + 2?", answers: ["3", "4", "5", "6"], correctAnswer: 1 },
-            { question: "¿Cuál es el idioma oficial de Brasil?", answers: ["Portugués", "Español", "Inglés", "Francés"], correctAnswer: 0 }
-        ];
+    { question: "¿Cómo reaccionas cuando te enfrentas a un conflicto en el trabajo?", answers: ["Evito el conflicto", "Busco una solución", "Delego el problema", "Enfrento directamente al colega"], correctAnswer: 1 },
+    { question: "¿Cuál consideras que es tu mayor fortaleza en el trabajo?", answers: ["Resiliencia", "Liderazgo", "Comunicación", "Creatividad"], correctAnswer: 2 },
+    { question: "¿Qué sueles hacer cuando tienes un desacuerdo con un compañero?", answers: ["Lo ignoro", "Converso para resolverlo", "Busco apoyo externo", "Acepto su punto de vista"], correctAnswer: 1 },
+    { question: "¿Cómo manejas el estrés en el trabajo?", answers: ["Medito o hago ejercicios de respiración", "Me desconecto por un momento", "Pido ayuda", "Evito el trabajo estresante"], correctAnswer: 0 },
+    { question: "¿Qué harías si un compañero se atribuye el crédito por tu trabajo?", answers: ["Lo enfrento directamente", "Informo a mi jefe", "Lo dejo pasar", "Hablo con el compañero para aclarar"], correctAnswer: 3 },
+    { question: "¿Cómo manejas el equilibrio entre tu vida personal y laboral?", answers: ["Defino límites claros", "Llevo trabajo a casa si es necesario", "Me enfoco solo en el trabajo", "Dejo que el trabajo fluya en la vida personal"], correctAnswer: 0 },
+    { question: "¿Qué harías si un colega actúa de manera poco ética?", answers: ["Lo reporto a recursos humanos", "Hablo con él directamente", "No intervengo", "Apoyo la acción para evitar problemas"], correctAnswer: 1 },
+    { question: "¿Qué tan cómodo te sientes al recibir críticas constructivas?", answers: ["Muy cómodo", "Incómodo", "Neutral", "Muy incómodo"], correctAnswer: 0 },
+    { question: "¿Cuál es tu prioridad cuando trabajas en equipo?", answers: ["Comunicación clara", "Evitar conflictos", "Ser el líder", "Completar la tarea rápido"], correctAnswer: 0 },
+    { question: "¿Cómo te preparas para cumplir un plazo ajustado?", answers: ["Organizo y priorizo tareas", "Trabajo extra horas", "Pido ayuda", "Trabajo sin descanso hasta terminar"], correctAnswer: 0 },
+    { question: "¿Qué haces cuando te sientes abrumado en el trabajo?", answers: ["Tomo un descanso", "Hago una lista de tareas", "Pido ayuda", "Ignoro la sensación"], correctAnswer: 1 },
+    { question: "¿Te consideras una persona que evita problemas?", answers: ["Sí, prefiero evitar conflictos", "No, los enfrento directamente", "Depende de la situación", "Solo si es necesario"], correctAnswer: 2 },
+    { question: "¿Cuál es tu enfoque para resolver problemas personales en el trabajo?", answers: ["Los dejo fuera del trabajo", "Busco apoyo de colegas", "Me enfoco en el trabajo", "Evito pensar en ello"], correctAnswer: 0 },
+    { question: "¿Qué harías si no estás de acuerdo con una decisión de tu jefe?", answers: ["Lo acepto y sigo adelante", "Expreso mi opinión respetuosamente", "Ignoro la decisión", "Busco apoyo de otros colegas"], correctAnswer: 1 },
+    { question: "¿Qué significa para ti trabajar éticamente?", answers: ["Cumplir las reglas", "Ser justo y honesto", "Evitar problemas legales", "Seguir las órdenes de mi jefe"], correctAnswer: 1 },
+    { question: "¿Cómo manejas los errores en el trabajo?", answers: ["Asumo responsabilidad y aprendo", "Los ignoro", "Busco a alguien más responsable", "Evito que se noten"], correctAnswer: 0 },
+    { question: "¿Cuál es tu reacción cuando sientes que estás en un entorno laboral tóxico?", answers: ["Me adapto", "Busco soluciones", "Considero cambiar de trabajo", "Evito el conflicto"], correctAnswer: 1 },
+    { question: "¿Qué haces cuando tienes una carga de trabajo excesiva?", answers: ["Organizo mejor mi tiempo", "Pido ayuda", "Trabajo más horas", "Ignoro otras tareas"], correctAnswer: 0 },
+    { question: "¿Qué harías si te das cuenta de que un colega está pasando por un mal momento personal?", answers: ["Ofrezco ayuda", "Ignoro la situación", "Lo evito para no afectar el trabajo", "Informo a un superior"], correctAnswer: 0 },
+    { question: "¿Qué tan importante es para ti seguir un código de ética profesional?", answers: ["Muy importante", "Poco importante", "Depende de la situación", "No es una prioridad"], correctAnswer: 0 },
+    { question: "¿Cómo manejas las críticas negativas sobre tu desempeño?", answers: ["Aprendo de ellas", "Las ignoro", "Me defiendo", "Me siento afectado"], correctAnswer: 0 },
+    { question: "¿Qué significa para ti ser resiliente en el trabajo?", answers: ["Adaptarme a los cambios", "Ignorar los problemas", "Pedir ayuda", "Delegar tareas difíciles"], correctAnswer: 0 },
+    { question: "¿Cuál es tu enfoque para resolver conflictos entre compañeros?", answers: ["Mediar entre ellos", "Evitar involucrarme", "Reportarlo a un superior", "Escoger un lado"], correctAnswer: 0 },
+    { question: "¿Qué tan bien manejas la presión para cumplir metas exigentes?", answers: ["Muy bien", "Bien", "Mal", "Muy mal"], correctAnswer: 0 },
+    { question: "¿Cómo reaccionas ante los cambios inesperados en el trabajo?", answers: ["Me adapto rápidamente", "Me siento incómodo", "Me quejo", "Busco ayuda"], correctAnswer: 0 },
+    { question: "¿Qué tan importante es la transparencia en el trabajo para ti?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
+    { question: "¿Cuál es tu actitud hacia las normas de la empresa?", answers: ["Las respeto", "Las cuestiono", "Las ignoro si no estoy de acuerdo", "Las sigo solo cuando son convenientes"], correctAnswer: 0 },
+    { question: "¿Cómo reaccionas si un proyecto fracasa?", answers: ["Analizo y aprendo de los errores", "Busco responsabilidades en otros", "Dejo de esforzarme", "Me siento desmotivado"], correctAnswer: 0 },
+    { question: "¿Qué haces si te piden realizar una tarea fuera de tu área de conocimiento?", answers: ["Investigo para hacerlo bien", "Pido ayuda", "Rechazo la tarea", "La delego a alguien más"], correctAnswer: 0 },
+    { question: "¿Qué prefieres en el trabajo: liderazgo o colaboración?", answers: ["Liderazgo", "Colaboración", "Ambos", "Ninguno"], correctAnswer: 2 },
+    // Agrega más preguntas siguiendo el mismo formato
+];
 
         const usedQuestions = new Set();
         let currentQuestionIndex = -1;
