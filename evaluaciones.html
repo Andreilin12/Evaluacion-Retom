@@ -94,7 +94,7 @@
     <!-- Contenedor de Bienvenida -->
     <div id="welcome-container" style="display: none;">
         <img src="https://firebasestorage.googleapis.com/v0/b/rrhh-ee7e3.appspot.com/o/RETOM%20COMPLETO%20(2).png?alt=media&token=2e334ae1-57f3-4d8f-a8fd-b410e54f1236" alt="Logo de la empresa" class="logo">
-        <h1>Bienvenido, <span id="user-name"></span>!</h1>
+        <h1>Bienvenid@, <span id="user-name"></span>!</h1>
         <button id="start-quiz" style="display: none;">Iniciar Evaluación</button>
     </div>
 
@@ -166,7 +166,7 @@
                     document.getElementById("login-container").style.display = "none";
                     document.getElementById("welcome-container").style.display = "block";
                     document.getElementById("start-quiz").style.display = "block";
-                    document.getElementById("user-name").textContent = user.name;
+                    document.getElementById("user-name").textContent = user.username;
                     sessionStorage.setItem("token", tokenInput);
                     sessionStorage.setItem("userName", user.name);
                 }
