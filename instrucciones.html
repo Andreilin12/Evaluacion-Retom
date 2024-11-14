@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -56,28 +56,11 @@
             color: #16e086;
         }
 
-        .device-info .icon-mobile {
-            color: #ff4081;
-        }
-
-        .device-info .icon-tablet {
-            color: #fbc02d;
-        }
-
-        .device-info .icon-pc {
-            color: #4caf50;
-        }
-
         .instructions {
             margin-top: 20px;
             text-align: left;
             font-size: 16px;
             margin-bottom: 25px;
-        }
-
-        .instructions p {
-            color: #fff;
-            margin-bottom: 15px;
         }
 
         .instructions ul {
@@ -86,10 +69,6 @@
             padding: 0;
             margin: 0;
             font-size: 14px;
-        }
-
-        .instructions ul li {
-            margin-bottom: 10px;
         }
 
         .start-btn {
@@ -127,8 +106,7 @@
     <div class="device-info">
         <h3>Detalles de tu dispositivo</h3>
         <p><i id="deviceIcon" class="fas"></i><strong>Dispositivo:</strong> <span id="deviceType"></span></p>
-        <p><i class="fas fa-signal"></i><strong>Señal de Internet:</strong> <span id="signalLevel">Cargando...</span></p>
-        <p><i class="fas fa-wifi"></i><strong>Red Wi-Fi:</strong> <span id="wifiNetwork">Cargando...</span></p>
+        <p><i class="fas fa-signal"></i><strong>Conectividad:</strong> <span id="networkInfo">Cargando...</span></p>
         <p><i class="fas fa-battery-full"></i><strong>Batería:</strong> <span id="batteryLevel">Cargando...</span></p>
     </div>
 
@@ -153,53 +131,43 @@
     function getDeviceType() {
         const userAgent = navigator.userAgent || navigator.vendor || window.opera;
 
-        // Detección para dispositivos móviles
         if (/android/i.test(userAgent)) {
             return { type: "Móvil Android", icon: "fa-mobile-alt" };
         }
         if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
             return { type: "iPhone/iPad", icon: "fa-mobile-alt" };
         }
-        // Detección para PC
         if (/Windows/i.test(userAgent)) {
             return { type: "PC (Windows)", icon: "fa-desktop" };
         }
         if (/Macintosh/i.test(userAgent)) {
             return { type: "PC (Mac)", icon: "fa-desktop" };
         }
-        // Detección para tabletas
         if (/tablet/i.test(userAgent) || /iPad/i.test(userAgent)) {
             return { type: "Tablet", icon: "fa-tablet-alt" };
         }
         return { type: "Dispositivo desconocido", icon: "fa-question-circle" };
     }
 
-    // Detección de la señal de red
-    function updateSignalLevel() {
+    // Detección de la conectividad
+    function updateNetworkInfo() {
         if (navigator.connection) {
             const connection = navigator.connection;
             const signalStrength = connection.downlinkMax || 0;
             const type = connection.effectiveType;
 
-            document.getElementById('signalLevel').textContent = `${Math.round(signalStrength * 10)}% - Tipo: ${type}`;
-        } else {
-            document.getElementById('signalLevel').textContent = "Sin información";
-        }
-    }
-
-    // Detección de red Wi-Fi
-    function updateWifiNetwork() {
-        if (navigator.connection) {
-            const type = navigator.connection.type;
+            let connectivityStatus = `${Math.round(signalStrength * 10)}% - Tipo: ${type}`;
             if (type === 'wifi') {
-                document.getElementById('wifiNetwork').textContent = 'Conectado a Wi-Fi';
-            } else if (type === 'cellular') {
-                document.getElementById('wifiNetwork').textContent = 'Conectado a datos móviles';
+                connectivityStatus += ' (Wi-Fi conectado)';
+            } else if (type === '4g' || type === '3g' || type === '2g') {
+                connectivityStatus += ' (Datos móviles activos)';
             } else {
-                document.getElementById('wifiNetwork').textContent = 'Conectado por cable o sin red';
+                connectivityStatus += ' (Sin conexión)';
             }
+
+            document.getElementById('networkInfo').textContent = connectivityStatus;
         } else {
-            document.getElementById('wifiNetwork').textContent = "Sin información";
+            document.getElementById('networkInfo').textContent = "Sin información";
         }
     }
 
@@ -219,11 +187,16 @@
     // Asignar la información detectada
     const deviceInfo = getDeviceType();
     document.getElementById('deviceType').textContent = deviceInfo.type;
-    document.getElementById('deviceIcon').classList.add("fas", deviceInfo.icon); // Añadir el icono al <i>
+    document.getElementById('deviceIcon').classList.add("fas", deviceInfo.icon);
 
-    updateSignalLevel();
-    updateWifiNetwork();
+    // Llamada a las funciones
+    updateNetworkInfo();
     updateBatteryLevel();
+
+    // Actualización automática de la conectividad
+    if (navigator.connection) {
+        navigator.connection.addEventListener('change', updateNetworkInfo);
+    }
 </script>
 
 </body>
