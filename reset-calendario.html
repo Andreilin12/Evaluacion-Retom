@@ -114,7 +114,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-        import { getFirestore, collection, doc, setDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, deleteDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCFfkmEDjqAwJNtnKByRQNt9NUQs5UdNa0",
@@ -128,7 +129,22 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
 
+        let currentUser = null;
+
+        // Función para manejar el estado de autenticación
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user; // El usuario está logueado
+                renderCalendar(); // Renderizar el calendario después de que el usuario se loguee
+            } else {
+                alert("Debes iniciar sesión para usar esta funcionalidad.");
+                window.location.href = '/login'; // Redirigir al login si no hay usuario logueado
+            }
+        });
+
+        // Renderizar el calendario
         async function renderCalendar() {
             const calendarElement = document.getElementById('calendar');
             calendarElement.innerHTML = '';
@@ -188,20 +204,22 @@
             return "No hay eventos";
         }
 
-        // Restablecer calendario
+        // Restablecer solo los eventos del usuario logueado
         document.getElementById("resetButton").addEventListener("click", async () => {
-            const calendarCollection = collection(db, "calendar");
-            const querySnapshot = await getDocs(calendarCollection);
+            if (currentUser) {
+                const calendarCollection = collection(db, "calendar");
+                const q = query(calendarCollection, where("userId", "==", currentUser.uid));
+                const querySnapshot = await getDocs(q);
 
-            querySnapshot.forEach(async (doc) => {
-                await deleteDoc(doc.ref);
-            });
-            
-            alert("Todos los eventos se han eliminado.");
-            renderCalendar();
+                querySnapshot.forEach(async (doc) => {
+                    await deleteDoc(doc.ref);
+                });
+
+                alert("Tus eventos han sido eliminados.");
+                renderCalendar(); // Vuelve a renderizar el calendario después de borrar los eventos
+            }
         });
 
-        renderCalendar();
     </script>
 </body>
 </html>
