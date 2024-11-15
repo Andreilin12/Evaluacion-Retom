@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <title>Ajuste Calendario</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #2c3e50;
+            color: #c5c6c7;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #15a086;
+            margin-top: 20px;
+            font-size: 2em;
+        }
+
+        #calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            grid-gap: 10px;
+            max-width: 100%;
+            margin: 20px auto;
+            padding: 15px;
+            background-color: #1f2833;
+            border-radius: 8px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .calendar-header {
+            grid-column: span 7;
+            font-size: 1.8em;
+            color: #15a086;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .week-day {
+            color: #45a29e;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .day {
+            padding: 20px;
+            background-color: #15a086;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .day:hover {
+            background-color: #16e086;
+            color: #0b0c10;
+        }
+
+        .current-day {
+            background-color: #c5c6c7;
+            color: #0b0c10;
+            font-weight: bold;
+        }
+
+        .event {
+            margin-top: 8px;
+            font-size: 0.9em;
+            color: #66fcf1;
+        }
+
+        .icon-btn {
+            font-size: 1.5em;
+            color: #16e086;
+            margin-top: 5px;
+            transition: color 0.3s;
+        }
+
+        .icon-btn:hover {
+            color: #15a086;
+        }
+
+        /* Reset Button */
+        #resetButton {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #16e086;
+            color: #0b0c10;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #resetButton:hover {
+            background-color: #15a086;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Ajuste Calendario</h1>
+    <button id="resetButton">Restablecer Calendario</button>
+    <div id="calendar"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+        import { getFirestore, collection, doc, setDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCFfkmEDjqAwJNtnKByRQNt9NUQs5UdNa0",
+            authDomain: "rrhh-ee7e3.firebaseapp.com",
+            projectId: "rrhh-ee7e3",
+            storageBucket: "rrhh-ee7e3.appspot.com",
+            messagingSenderId: "605891607617",
+            appId: "1:605891607617:web:daedbd7b7b5a8b901ac0",
+            measurementId: "G-Q801R9M95S"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function renderCalendar() {
+            const calendarElement = document.getElementById('calendar');
+            calendarElement.innerHTML = '';
+
+            const date = new Date();
+            const currentMonth = date.getMonth();
+            const currentYear = date.getFullYear();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+
+            const headerElement = document.createElement('div');
+            headerElement.classList.add('calendar-header');
+            headerElement.textContent = `Año ${currentYear}`;
+            calendarElement.appendChild(headerElement);
+
+            const weekDays = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+            weekDays.forEach(day => {
+                const dayElement = document.createElement('div');
+                dayElement.classList.add('week-day');
+                dayElement.textContent = day;
+                calendarElement.appendChild(dayElement);
+            });
+
+            for (let i = 0; i < firstDayOfMonth; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.classList.add('day');
+                calendarElement.appendChild(emptyCell);
+            }
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayElement = document.createElement('div');
+                dayElement.classList.add('day');
+                dayElement.textContent = i;
+                dayElement.id = `day-${i}`;
+
+                const today = new Date();
+                if (today.getDate() === i && today.getMonth() === currentMonth && today.getFullYear() === currentYear) {
+                    dayElement.classList.add('current-day');
+                }
+
+                const eventElement = document.createElement('div');
+                eventElement.classList.add('event');
+                eventElement.textContent = await getEventData(i);
+                dayElement.appendChild(eventElement);
+
+                calendarElement.appendChild(dayElement);
+            }
+        }
+
+        async function getEventData(day) {
+            const dayDocRef = doc(db, "calendar", `${day}`);
+            const docSnap = await getDocs(dayDocRef);
+            if (docSnap.exists()) {
+                const dayData = docSnap.data();
+                return `Evento: ${dayData.description}`;
+            }
+            return "No hay eventos";
+        }
+
+        // Restablecer calendario
+        document.getElementById("resetButton").addEventListener("click", async () => {
+            const calendarCollection = collection(db, "calendar");
+            const querySnapshot = await getDocs(calendarCollection);
+
+            querySnapshot.forEach(async (doc) => {
+                await deleteDoc(doc.ref);
+            });
+            
+            alert("Todos los eventos se han eliminado.");
+            renderCalendar();
+        });
+
+        renderCalendar();
+    </script>
+</body>
+</html>
