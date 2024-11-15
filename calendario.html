@@ -252,87 +252,120 @@
         <button class="close-btn" id="closeViewForm">Cerrar</button>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCFfkmEDjqAwJNtnKByRQNt9NUQs5UdNa0",
-            authDomain: "rrhh-ee7e3.firebaseapp.com",
-            projectId: "rrhh-ee7e3",
-            storageBucket: "rrhh-ee7e3.appspot.com",
-            messagingSenderId: "605891607617",
-            appId: "1:605891607617:web:daedbd7b7b5a8b901ac0",
-            measurementId: "G-Q801R9M95S"
-        };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
 
-        let selectedDay = null;
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
 
-        function renderCalendar() {
-            const calendarElement = document.getElementById('calendar');
-            calendarElement.innerHTML = '';
-            const date = new Date();
-            const currentMonth = date.getMonth();
-            const currentYear = date.getFullYear();
-            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-            const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+    const firebaseConfig = {
+        apiKey: "AIzaSyCFfkmEDjqAwJNtnKByRQNt9NUQs5UdNa0",
+        authDomain: "rrhh-ee7e3.firebaseapp.com",
+        projectId: "rrhh-ee7e3",
+        storageBucket: "rrhh-ee7e3.appspot.com",
+        messagingSenderId: "605891607617",
+        appId: "1:605891607617:web:daedbd7b7b5a8b901ac0",
+        measurementId: "G-Q801R9M95S"
+    };
 
-            const headerElement = document.createElement('div');
-            headerElement.classList.add('calendar-header');
-            headerElement.textContent = `Año ${currentYear}`;
-            calendarElement.appendChild(headerElement);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth();
 
-            const weekDays = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
-            weekDays.forEach(day => {
-                const dayElement = document.createElement('div');
-                dayElement.classList.add('week-day');
-                dayElement.textContent = day;
-                calendarElement.appendChild(dayElement);
-            });
+    let selectedDay = null;
+    let currentUser = null;
 
-            for (let i = 0; i < firstDayOfMonth; i++) {
-                const emptyCell = document.createElement('div');
-                emptyCell.classList.add('day');
-                calendarElement.appendChild(emptyCell);
-            }
+    // Verificar si el usuario está logueado
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUser = user; // Guardamos el usuario logueado
+            console.log('Usuario logueado:', user.email);
+            renderCalendar();
+        } else {
+            currentUser = null;
+            showLoginAlert(); // Si no hay usuario logueado, mostramos la alerta
+        }
+    });
 
-            for (let i = 1; i <= daysInMonth; i++) {
-                const dayElement = document.createElement('div');
-                dayElement.classList.add('day');
-                dayElement.textContent = i;
-                dayElement.id = `day-${i}`;
+    // Función para mostrar alerta de inicio de sesión
+    function showLoginAlert() {
+        const alertDiv = document.createElement('div');
+        alertDiv.classList.add('login-alert');
+        alertDiv.textContent = '¡Debes iniciar sesión para continuar!';
+        document.body.appendChild(alertDiv);
+        setTimeout(() => alertDiv.remove(), 3000); // La alerta desaparecerá después de 3 segundos
+    }
 
-                const today = new Date();
-                if (today.getDate() === i && today.getMonth() === currentMonth && today.getFullYear() === currentYear) {
-                    dayElement.classList.add('current-day');
-                }
+    // Función para renderizar el calendario
+    function renderCalendar() {
+        const calendarElement = document.getElementById('calendar');
+        calendarElement.innerHTML = '';
+        const date = new Date();
+        const currentMonth = date.getMonth();
+        const currentYear = date.getFullYear();
+        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+        const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
 
-                getEventData(i);
-                
-                const editIcon = document.createElement('i');
-                editIcon.classList.add('fas', 'fa-edit', 'icon-btn');
-                editIcon.title = "Editar";
-                editIcon.addEventListener('click', () => openEditForm(i));
-                
-                const viewIcon = document.createElement('i');
-                viewIcon.classList.add('fas', 'fa-eye', 'icon-btn');
-                viewIcon.title = "Ver Evento";
-                viewIcon.addEventListener('click', () => openViewForm(i));
+        const headerElement = document.createElement('div');
+        headerElement.classList.add('calendar-header');
+        headerElement.textContent = `Año ${currentYear}`;
+        calendarElement.appendChild(headerElement);
 
-                dayElement.appendChild(editIcon);
-                dayElement.appendChild(viewIcon);
-                calendarElement.appendChild(dayElement);
-            }
+        const weekDays = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
+        weekDays.forEach(day => {
+            const dayElement = document.createElement('div');
+            dayElement.classList.add('week-day');
+            dayElement.textContent = day;
+            calendarElement.appendChild(dayElement);
+        });
+
+        for (let i = 0; i < firstDayOfMonth; i++) {
+            const emptyCell = document.createElement('div');
+            emptyCell.classList.add('day');
+            calendarElement.appendChild(emptyCell);
         }
 
-        async function getEventData(day) {
-            const dayDocRef = doc(db, "calendar", `${day}`);
-            const docSnap = await getDoc(dayDocRef);
-            if (docSnap.exists()) {
-                const dayData = docSnap.data();
+        for (let i = 1; i <= daysInMonth; i++) {
+            const dayElement = document.createElement('div');
+            dayElement.classList.add('day');
+            dayElement.textContent = i;
+            dayElement.id = `day-${i}`;
+
+            const today = new Date();
+            if (today.getDate() === i && today.getMonth() === currentMonth && today.getFullYear() === currentYear) {
+                dayElement.classList.add('current-day');
+            }
+
+            getEventData(i);
+            
+            const editIcon = document.createElement('i');
+            editIcon.classList.add('fas', 'fa-edit', 'icon-btn');
+            editIcon.title = "Editar";
+            editIcon.addEventListener('click', () => openEditForm(i));
+            
+            const viewIcon = document.createElement('i');
+            viewIcon.classList.add('fas', 'fa-eye', 'icon-btn');
+            viewIcon.title = "Ver Evento";
+            viewIcon.addEventListener('click', () => openViewForm(i));
+
+            dayElement.appendChild(editIcon);
+            dayElement.appendChild(viewIcon);
+            calendarElement.appendChild(dayElement);
+        }
+    }
+
+    // Obtener los datos del evento para un día específico
+    async function getEventData(day) {
+        if (!currentUser) return; // Si no hay usuario logueado, no se muestra nada
+
+        const dayDocRef = doc(db, "calendar", `${day}`);
+        const docSnap = await getDoc(dayDocRef);
+        if (docSnap.exists()) {
+            const dayData = docSnap.data();
+            // Solo mostrar el evento si pertenece al usuario logueado
+            if (dayData.userId === currentUser.uid) {
                 const dayElement = document.getElementById(`day-${day}`);
                 dayElement.style.backgroundColor = dayData.color || "#2c2c2c";
                 const eventElement = document.createElement('div');
@@ -341,59 +374,68 @@
                 dayElement.appendChild(eventElement);
             }
         }
+    }
 
-        function openEditForm(day) {
-            selectedDay = day;
-            document.getElementById('editForm').style.display = 'block';
+    // Abre el formulario de edición
+    function openEditForm(day) {
+        selectedDay = day;
+        document.getElementById('editForm').style.display = 'block';
+    }
+
+    // Abre el formulario de visualización
+    function openViewForm(day) {
+        selectedDay = day;
+        document.getElementById('viewForm').style.display = 'block';
+        loadEventDetails(day);
+    }
+
+    // Cargar los detalles del evento en el formulario de vista
+    async function loadEventDetails(day) {
+        const dayDocRef = doc(db, "calendar", `${day}`);
+        const docSnap = await getDoc(dayDocRef);
+        if (docSnap.exists()) {
+            const dayData = docSnap.data();
+            document.getElementById('viewDescription').textContent = `Descripción: ${dayData.description}`;
+        } else {
+            document.getElementById('viewDescription').textContent = "No hay eventos para este día.";
         }
+    }
 
-        function openViewForm(day) {
-            selectedDay = day;
-            document.getElementById('viewForm').style.display = 'block';
-            loadEventDetails(day);
+    // Guardar los cambios en el evento
+    document.getElementById('saveEvent').addEventListener('click', async () => {
+        if (!currentUser) return; // Si no hay usuario logueado, no hacer nada
+
+        const eventDescription = document.getElementById('eventDescription').value;
+        const eventColor = document.getElementById('eventColor').value;
+        const eventSound = document.getElementById('eventSound').value;
+
+        if (selectedDay) {
+            await setDoc(doc(db, "calendar", `${selectedDay}`), {
+                description: eventDescription,
+                color: eventColor,
+                sound: eventSound,
+                userId: currentUser.uid // Guardamos el userId para asociar el evento con el usuario logueado
+            });
+            renderCalendar();
+            closeEditForm();
         }
+    });
 
-        async function loadEventDetails(day) {
-            const dayDocRef = doc(db, "calendar", `${day}`);
-            const docSnap = await getDoc(dayDocRef);
-            if (docSnap.exists()) {
-                const dayData = docSnap.data();
-                document.getElementById('viewDescription').textContent = `Descripción: ${dayData.description}`;
-            } else {
-                document.getElementById('viewDescription').textContent = "No hay eventos para este día.";
-            }
-        }
+    // Cerrar el formulario de edición
+    document.getElementById('closeEditForm').addEventListener('click', closeEditForm);
+    // Cerrar el formulario de visualización
+    document.getElementById('closeViewForm').addEventListener('click', closeViewForm);
 
-        document.getElementById('saveEvent').addEventListener('click', async () => {
-            const eventDescription = document.getElementById('eventDescription').value;
-            const eventColor = document.getElementById('eventColor').value;
-            const eventSound = document.getElementById('eventSound').value;
+    function closeEditForm() {
+        document.getElementById('editForm').style.display = 'none';
+        selectedDay = null;
+    }
 
-            if (selectedDay) {
-                await setDoc(doc(db, "calendar", `${selectedDay}`), {
-                    description: eventDescription,
-                    color: eventColor,
-                    sound: eventSound
-                });
-                renderCalendar();
-                closeEditForm();
-            }
-        });
+    function closeViewForm() {
+        document.getElementById('viewForm').style.display = 'none';
+        selectedDay = null;
+    }
 
-        document.getElementById('closeEditForm').addEventListener('click', closeEditForm);
-        document.getElementById('closeViewForm').addEventListener('click', closeViewForm);
-
-        function closeEditForm() {
-            document.getElementById('editForm').style.display = 'none';
-            selectedDay = null;
-        }
-
-        function closeViewForm() {
-            document.getElementById('viewForm').style.display = 'none';
-            selectedDay = null;
-        }
-
-        renderCalendar();
-    </script>
+</script>
 </body>
 </html>
