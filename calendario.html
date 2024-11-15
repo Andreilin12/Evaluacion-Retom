@@ -6,132 +6,193 @@
     <title>Calendario</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #2C3E50;
-            color: #FFF;
-            text-align: center;
-            font-size: 1.1em;
-        }
+<style>
+    body {
+        font-family: 'Roboto', sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #2C3E50;
+        color: #FFF;
+        text-align: center;
+        font-size: 1em;
+    }
 
+    h1 {
+        margin-top: 20px;
+        color: #fff;
+        font-size: 1.5em;
+    }
+
+    #calendar {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        grid-gap: 8px;
+        max-width: 100%;
+        margin: 20px auto;
+        padding: 10px;
+        background-color: #15A086;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        box-sizing: border-box;
+        width: 100%;
+    }
+
+    .calendar-header {
+        grid-column: span 7;
+        font-size: 1.5em;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #fff;
+    }
+
+    .week-day {
+        color: #000;
+        font-weight: bold;
+        padding: 10px 0;
+    }
+
+    .day {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        padding: 15px;
+        background-color: #2c3e50;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        font-size: 0.9em;
+    }
+
+    .day:hover {
+        background-color: #16e086;
+    }
+
+    .current-day {
+        background-color: #ffeb3b;
+        font-weight: bold;
+        color: #000;
+    }
+
+    .day-number {
+        font-size: 1.2em;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .icons-container {
+        display: flex;
+        gap: 5px;
+    }
+
+    .icon-btn {
+        cursor: pointer;
+        font-size: 1.2em;
+        color: #15a086;
+    }
+
+    .edit-form, .view-form {
+        display: none;
+        background-color: #2c3e50;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #fff;
+        width: 90%;
+        box-sizing: border-box;
+    }
+
+    .edit-form input,
+    .edit-form textarea,
+    .edit-form select {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 1em;
+    }
+
+    .edit-form button, .view-form button {
+        width: 100%;
+        padding: 10px;
+        background-color: #15a086;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1em;
+        cursor: pointer;
+    }
+
+    .edit-form button:hover, .view-form button:hover {
+        background-color: #16e086;
+    }
+
+    /* Responsividad para pantallas móviles */
+    @media (max-width: 600px) {
         h1 {
-            margin-top: 20px;
-            color: #fff;
-            font-size: 1.5em;
+            font-size: 1.2em;
         }
 
         #calendar {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            grid-gap: 8px;
-            max-width: 100%;
-            margin: 20px auto;
-            padding: 10px;
-            background-color: #15A086;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            grid-template-columns: repeat(3, 1fr);
+            grid-gap: 5px;
+            padding: 8px;
         }
 
         .calendar-header {
-            grid-column: span 7;
-            font-size: 1.5em;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #fff;
+            font-size: 1.2em;
+            grid-column: span 3;
         }
 
         .week-day {
-            color: #000;
-            font-weight: bold;
-            padding: 10px 0;
+            font-size: 0.8em;
+            padding: 6px 0;
         }
 
         .day {
-            padding: 15px;
-            background-color: #2c3e50;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            position: relative;
-            text-align: center;
-            font-size: 0.9em;
+            padding: 10px;
+            font-size: 0.7em;
         }
 
-        .day:hover {
-            background-color: #16e086;
-        }
-
-        .current-day {
-            background-color: #ffeb3b;
-            font-weight: bold;
-            color: #000;
-
-        }
-
-        .event {
-            margin-top: 5px;
-            font-size: 0.8em;
-        }
-
-        .icon-btn {
-            cursor: pointer;
-            font-size: 1.2em;
-            color: #15a086;
-            margin: 0 5px;
-        }
-
-        /* Estilos para el cuadro de edición */
         .edit-form, .view-form {
-            display: none;
-            background-color: #2c3e50;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            max-width: 100%;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #fff;
+            width: 95%;
+            padding: 15px;
         }
+    }
 
-        .edit-form input,
-        .edit-form textarea,
-        .edit-form select {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 8px;
+    @media (max-width: 400px) {
+        h1 {
             font-size: 1em;
         }
 
-        .edit-form button, .view-form button {
-            width: 50%;
-            padding: 10px;
-            background-color: #15a086;
-            color: white;
-            border: none;
-            border-radius: 8px;
+        #calendar {
+            grid-template-columns: repeat(2, 1fr);
+            padding: 5px;
+            grid-gap: 4px;
+        }
+
+        .calendar-header {
             font-size: 1em;
-            cursor: pointer;
+            grid-column: span 2;
         }
 
-        .edit-form button:hover, .view-form button:hover {
-            background-color: #16e086;
+        .week-day {
+
+            font-size: 0.7em;
         }
 
-        .close-btn {
-            background-color: #16e086;
+        .day {
+            padding: 8px;
+            font-size: 0.6em;
         }
+    }
+</style>
 
-        .close-btn:hover {
-            background-color: #16e086;
-        }
-    </style>
 </head>
 <body>
 
