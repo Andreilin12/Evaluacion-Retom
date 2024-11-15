@@ -90,136 +90,335 @@
     </div>
 
     <script>
-        const questions = [
-    { question: "¿Cómo defines la ética en el trabajo?", answers: ["Cumplir con la ley", "Ser honesto y justo", "Seguir órdenes", "Evitar conflictos"], correctAnswer: 1 },
-    { question: "¿Qué harías si tienes un conflicto con un colega?", answers: ["Conversar con él", "Ignorarlo", "Reportarlo a un superior", "Pedir ayuda a otros colegas"], correctAnswer: 0 },
-    { question: "¿Qué haces si un proyecto no se desarrolla como esperabas?", answers: ["Analizo y ajusto el plan", "Abandono el proyecto", "Dejo que otros se encarguen", "Me frustro y sigo igual"], correctAnswer: 0 },
-    { question: "¿Qué harías si no te sientes valorado en el trabajo?", answers: ["Hablar con mi jefe", "Buscar otro trabajo", "Ignorar la situación", "Trabajar más duro"], correctAnswer: 0 },
-    { question: "¿Qué tan importante es para ti el trabajo en equipo?", answers: ["Muy importante", "Poco importante", "Moderadamente importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Qué harías si te sientes abrumado por tus responsabilidades?", answers: ["Priorizar tareas", "Ignorar la carga", "Pedir ayuda", "Renunciar"], correctAnswer: 0 },
-    { question: "¿Qué tan importante es para ti el equilibrio entre trabajo y vida personal?", answers: ["Muy importante", "Poco importante", "Moderadamente importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Cómo manejas las críticas constructivas?", answers: ["Aprendo de ellas", "Las ignoro", "Me pongo a la defensiva", "Las rechazo"], correctAnswer: 0 },
-    { question: "¿Qué haces si un cliente no está satisfecho con tu trabajo?", answers: ["Le ofrezco una solución", "Ignoro el problema", "Lo reporto", "Evito la responsabilidad"], correctAnswer: 0 },
-    { question: "¿Qué tan cómodo te sientes con los cambios en tu entorno laboral?", answers: ["Muy cómodo", "Algo incómodo", "Muy incómodo", "Neutral"], correctAnswer: 0 },
-    { question: "¿Qué harías si tienes un problema personal que interfiere con tu desempeño?", answers: ["Busco ayuda profesional", "Lo ignoro", "Me tomo un descanso", "Lo comunico a mi jefe"], correctAnswer: 3 },
-    { question: "¿Qué tan importante es para ti la honestidad en el trabajo?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
+               let questions = [
+    {
+        question: "Si tu jefe te asigna una tarea difícil con poca instrucción, ¿qué harías?",
+        answers: [
+            "Investigar y resolverla de la mejor manera posible",
+            "Solicitar apoyo de un compañero",
+            "Esperar que el jefe proporcione más detalles",
+            "Rechazar la tarea por falta de claridad"
+        ],
+        correctAnswer: 0
+    },
+    {
+        question: "¿Qué harías si consideras que una norma de la empresa es injusta?",
+        answers: [
+            "Discutir la norma con tu supervisor de manera constructiva",
+            "Ignorar la norma si no te afecta directamente",
+            "Proponer un cambio a través de los canales adecuados",
+            "Seguir la norma pero buscar trabajo en otra empresa"
+        ],
+        correctAnswer: 2
+    },
+    {
+        question: "¿Cómo manejarías un conflicto con un compañero de trabajo?",
+        answers: [
+            "Hablar directamente con él para resolverlo",
+            "Informar al supervisor inmediatamente",
+            "Evitarlo y centrarte en tu trabajo",
+            "Pedir apoyo de Recursos Humanos sin confrontación directa"
+        ],
+        correctAnswer: 0
+    },
+    {
+        question: "¿Qué harías si un cliente te solicita algo fuera de tus responsabilidades?",
+        answers: [
+            "Ofrecer alternativas dentro de tus posibilidades",
+            "Rechazar la solicitud educadamente",
+            "Solicitar apoyo de un superior para decidir",
+            "Ignorar la solicitud y continuar con tu trabajo"
+        ],
+        correctAnswer: 0
+    },
+    {
+        question: "¿Cómo actuarías si te piden trabajar horas extras sin previo aviso?",
+        answers: [
+            "Aceptar si es necesario para cumplir los objetivos",
+            "Negociar para compensar el tiempo extra luego",
+            "Rechazar las horas extras por falta de planificación",
+            "Solicitar claridad antes de decidir"
+        ],
+        correctAnswer: 1
+    },
+    {
+        question: "¿Qué harías si no te gusta la comida ofrecida en el comedor de la empresa?",
+        answers: [
+            "Llevarías tu propia comida para evitar inconvenientes",
+            "Proporcionarías sugerencias al encargado del comedor",
+            "Solicitarías una reunión para mejorar las opciones",
+            "No utilizarías el comedor pero lo mencionarías en encuestas"
+        ],
+        correctAnswer: 0
+    },
+    {
+        question: "Si consideras que no estás recibiendo el salario que mereces, ¿qué harías?",
+        answers: [
+            "Pedirías una reunión para negociar el salario",
+            "Trabajarías más duro para demostrar tu valor",
+            "Buscarías trabajo en otra empresa",
+            "Aceptarías la situación y seguirías trabajando"
+        ],
+        correctAnswer: 0
+    },
+    {
+        question: "¿Cómo reaccionarías si se implementan nuevas normas sin avisarte?",
+        answers: [
+            "Solicitarías información para entenderlas mejor",
+            "Aceptarías las normas aunque no las entiendas",
+            "Esperarías a ver cómo las aplican otros",
+            "Propondrías retrasar la implementación"
+        ],
+        correctAnswer: 0
+    },
+    {
+        question: "¿Qué harías si un compañero no cumple con su trabajo y afecta al equipo?",
+        answers: [
+            "Cubrirías su trabajo para no afectar al equipo",
+            "Hablarías directamente con él para solucionarlo",
+            "Informarías al supervisor para evitar problemas mayores",
+            "Ignorarías la situación y te enfocarías en tus tareas"
+        ],
+        correctAnswer: 2
+    },
+    {
+        question: "Si se te asigna un horario rotativo que no te favorece, ¿qué harías?",
+        answers: [
+            "Negociarías un horario más conveniente",
+            "Aceptas el cambio temporalmente mientras buscas una solución",
+            "Rechazarías el horario por completo",
+            "Solicitarías trabajar horarios fijos"
+        ],
+        correctAnswer: 1
+    },
+    {
+        question: "¿Qué harías si tienes que liderar un equipo por primera vez?",
+        answers: [
+            "Escucharías al equipo antes de tomar decisiones",
+            "Impondrías tus ideas para mostrar liderazgo",
+            "Delegarías todo el trabajo al equipo",
+            "Solicitarías apoyo para aprender a liderar mejor"
+        ],
+        correctAnswer: 0
+    },
+    {
+        question: "¿Cómo manejarías una crítica pública de tu supervisor?",
+        answers: [
+            "Escucharías y buscarías resolverlo en privado después",
+            "Responderías en el momento para aclarar la situación",
+            "Ignorarías la crítica y seguirías trabajando",
+            "Reportarías el incidente a Recursos Humanos"
+        ],
+        correctAnswer: 0
+    },
+    {
+        question: "¿Qué harías si encuentras discrepancias en tu pago quincenal?",
+        answers: [
+            "Informarías inmediatamente al departamento correspondiente",
+            "Esperarías a ver si se corrige en el próximo pago",
+            "Aceptarías la discrepancia para evitar conflictos",
+            "Lo comentarías con tus compañeros antes de actuar"
+        ],
+        correctAnswer: 0
+    },
+    {
+        question: "Si se implementan nuevas herramientas tecnológicas, ¿cómo reaccionarías?",
+        answers: [
+            "Capacitarte para aprovecharlas al máximo",
+            "Resistirte al cambio por la dificultad de adaptarte",
+            "Solicitar apoyo para comprenderlas mejor",
+            "Esperarías que otros aprendan primero"
+        ],
+        correctAnswer: 0
+    },
+    {
+        question: "¿Qué harías si descubres un error que podría costar dinero a la empresa?",
+        answers: [
+            "Lo informarías inmediatamente para corregirlo",
+            "Intentarías solucionarlo sin informar a nadie",
+            "Esperarías a ver si alguien más lo detecta",
+            "Ignorarías el error si no es tu responsabilidad"
+        ],
+        correctAnswer: 0
+    },
+    {
+        question: "Si un superior te asigna tareas repetitivas, ¿cómo reaccionarías?",
+        answers: [
+            "Buscarías formas de hacerlas más eficientes",
+            "Pedirías asignaciones más desafiantes",
+            "Aceptarías las tareas aunque sean aburridas",
+            "Te frustrarías por la falta de variedad"
+        ],
+        correctAnswer: 0
+    },
+
+    { question: "¿Qué tan importante es para ti la honestidad en el trabajo?", answers: ["Moderadamente importante", "Poco importante", "Muy importante", "Nada importante"], correctAnswer: 2 },
+
     { question: "¿Qué haces si tienes una carga de trabajo que parece inabordable?", answers: ["Organizo mis tareas", "Pido ayuda", "Me esfuerzo más", "Ignoro otras tareas"], correctAnswer: 0 },
-    { question: "¿Qué harías si alguien toma crédito por tu trabajo?", answers: ["Lo aclaro con respeto", "Me frustro pero lo ignoro", "Lo informo a mi jefe", "Lo dejo pasar"], correctAnswer: 0 },
-    { question: "¿Qué significa para ti el éxito en tu vida profesional?", answers: ["Lograr mis objetivos", "Ganar dinero", "Ser reconocido", "Tener estabilidad"], correctAnswer: 0 },
+
+    { question: "¿Qué harías si alguien toma crédito por tu trabajo?", answers: ["Me frustro pero lo ignoro", "Lo aclaro con respeto", "Lo informo a mi jefe", "Lo dejo pasar"], correctAnswer: 1 },
+
+    { question: "¿Qué significa para ti el éxito en tu vida profesional?", answers: ["Ganar dinero", "Ser reconocido", "Tener estabilidad", "Lograr mis objetivos", ], correctAnswer: 3 },
+
     { question: "¿Qué tan importante es mantener un equilibrio entre trabajo y vida personal?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Cómo enfrentas una situación de acoso en el trabajo?", answers: ["Lo reporto", "Lo ignoro", "Busco apoyo de otros colegas", "Lo enfrento solo"], correctAnswer: 0 },
-    { question: "¿Qué opinas sobre la transparencia en el lugar de trabajo?", answers: ["Es fundamental", "Es moderadamente importante", "No es necesaria", "Depende de la situación"], correctAnswer: 0 },
-    { question: "¿Qué haces si tienes que trabajar con alguien con quien no te llevas bien?", answers: ["Me adapto y colaboro", "Evito a la persona", "Hablo con mi jefe", "Hago mi trabajo sin colaborar"], correctAnswer: 0 },
+
+    { question: "¿Cómo enfrentas una situación de acoso en el trabajo?", answers: ["Lo ignoro", "Busco apoyo de otros colegas", "Lo reporto", "Lo enfrento solo"], correctAnswer: 2 },
+
+    { question: "¿Qué opinas sobre la transparencia en el lugar de trabajo?", answers: ["Es moderadamente importante", "Es fundamental", "No es necesaria", "Depende de la situación"], correctAnswer: 1 },
+
+    { question: "¿Qué haces si tienes que trabajar con alguien con quien no te llevas bien?", answers: ["Evito a la persona", "Hablo con mi jefe", "Hago mi trabajo sin colaborar", "Me adapto y colaboro",], correctAnswer: 3 },
+
     { question: "¿Cómo defines la responsabilidad en el trabajo?", answers: ["Cumplir con mis tareas", "Evitar errores", "Apoyar a otros", "Ser líder"], correctAnswer: 0 },
-    { question: "¿Cómo reaccionas cuando alguien critica tu trabajo?", answers: ["Escucho y aprendo", "Me defiendo", "Ignoro la crítica", "Me siento afectado"], correctAnswer: 0 },
-    { question: "¿Qué harías si te sientes estancado en tu trabajo actual?", answers: ["Busco oportunidades de crecimiento", "Me resigno", "Cambio de trabajo", "Me quejo con otros"], correctAnswer: 0 },
-    { question: "¿Qué prefieres en el trabajo: estabilidad o nuevos retos?", answers: ["Nuevos retos", "Estabilidad", "Ambos", "Ninguno"], correctAnswer: 0 },
-    { question: "¿Qué tan importante es para ti la creatividad en el trabajo?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Qué opinas de la competencia en el lugar de trabajo?", answers: ["Motivadora", "Desmotivadora", "Neutral", "Negativa"], correctAnswer: 0 },
-    { question: "¿Qué haces si tienes una idea que podría mejorar el proceso de trabajo?", answers: ["La comparto", "La guardo para mí", "La implemento solo", "La desestimo"], correctAnswer: 0 },
-    { question: "¿Qué tan importante es para ti un ambiente laboral positivo?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Qué haces si alguien en el equipo no cumple con su parte del trabajo?", answers: ["Lo converso con la persona", "Hablo con el jefe", "Ignoro la situación", "Asumo su trabajo"], correctAnswer: 0 },
-    { question: "¿Cómo manejas la presión en el trabajo?", answers: ["Mantengo la calma y priorizo", "Me estreso", "Delego", "Ignoro la presión"], correctAnswer: 0 },
-    { question: "¿Cómo reaccionas si un colega se atribuye tu trabajo?", answers: ["Converso con él", "Lo ignoro", "Lo informo a un superior", "Me frustro"], correctAnswer: 0 },
-    { question: "¿Qué tan importante es la comunicación en el equipo para ti?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Qué haces si encuentras un error en el trabajo de un colega?", answers: ["Se lo menciono", "Lo ignoro", "Hablo con el jefe", "Corrijo el error"], correctAnswer: 0 },
-    { question: "¿Qué tan cómodo te sientes dando retroalimentación?", answers: ["Muy cómodo", "Algo incómodo", "Muy incómodo", "Neutral"], correctAnswer: 0 },
-    { question: "¿Cómo definirías la ética profesional?", answers: ["Hacer lo correcto", "Cumplir reglas", "Buscar resultados", "Seguir órdenes"], correctAnswer: 0 },
-    { question: "¿Qué haces si un compañero rompe las normas de la empresa?", answers: ["Lo informo", "Lo ignoro", "Hablo con él", "Apoyo su decisión"], correctAnswer: 0 },
-    { question: "¿Cómo defines un buen liderazgo?", answers: ["Inspirar y guiar", "Ser estricto", "Tener autoridad", "Evitar conflictos"], correctAnswer: 0 },
-    { question: "¿Qué tan importante es para ti el desarrollo personal en el trabajo?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Qué haces si tienes una tarea difícil?", answers: ["Busco apoyo", "Me esfuerzo solo", "Evito la tarea", "La delego"], correctAnswer: 0 },
-    { question: "¿Qué prefieres: reconocimiento público o personal?", answers: ["Público", "Personal", "Ambos", "Ninguno"], correctAnswer: 1 },
-    { question: "¿Qué significa para ti la responsabilidad en el trabajo?", answers: ["Cumplir con mis tareas", "Evitar errores", "Apoyar a otros", "Ser líder"], correctAnswer: 0 },
-    { question: "¿Cómo reaccionas cuando un cliente no está satisfecho con tu trabajo?", answers: ["Intento solucionarlo", "Ignoro el problema", "Informo a mi jefe", "Evito responsabilidad"], correctAnswer: 0 },
-    { question: "¿Qué opinas sobre la importancia del trabajo en equipo?", answers: ["Es fundamental", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Cómo manejas la frustración en el trabajo?", answers: ["Canalizo la energía", "Ignoro la frustración", "Me desmotivo", "Busco apoyo"], correctAnswer: 0 },
-    { question: "¿Qué haces si necesitas mejorar una habilidad para tu puesto?", answers: ["Tomo cursos", "Ignoro la necesidad", "Busco ayuda", "Cambio de puesto"], correctAnswer: 0 },
-    { question: "¿Qué harías si un compañero no colabora en un proyecto grupal?", answers: ["Lo hablo con él", "Lo ignoro", "Lo reporto al jefe", "Hago su parte"], correctAnswer: 0 },
-    { question: "¿Cómo gestionas tus emociones en situaciones de alta presión?", answers: ["Respiro y me calmo", "Reprimo mis emociones", "Dejo que me afecte", "Lo hablo con otros"], correctAnswer: 0 },
-    { question: "¿Qué tan importante es la honestidad en tus relaciones laborales?", answers: ["Muy importante", "Poco importante", "Moderadamente importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Cómo reaccionas si tienes un problema personal que afecta tu trabajo?", answers: ["Busco ayuda", "Ignoro el problema", "Trabajo menos", "Lo comparto con mi equipo"], correctAnswer: 0 },
-    { question: "¿Qué haces si un superior te pide hacer algo que consideras éticamente incorrecto?", answers: ["Expreso mis preocupaciones", "Sigo órdenes", "Lo ignoro", "Lo discuto con colegas"], correctAnswer: 0 },
-    { question: "¿Qué tan importante es para ti un ambiente de trabajo seguro y respetuoso?", answers: ["Muy importante", "Poco importante", "Moderadamente importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Qué prefieres en el trabajo: autonomía o supervisión cercana?", answers: ["Autonomía", "Supervisión cercana", "Ambos", "Ninguno"], correctAnswer: 0 },
-    { question: "¿Qué harías si tienes un desacuerdo con tu jefe?", answers: ["Hablo de manera respetuosa", "Lo ignoro", "Busco apoyo de otros", "Hago lo que él/ella dice"], correctAnswer: 0 },
-    { question: "¿Qué importancia tiene para ti la justicia en el lugar de trabajo?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Cómo te sientes al asumir responsabilidades adicionales?", answers: ["Me motiva", "Me estresa", "Lo hago con dificultad", "Lo evito"], correctAnswer: 0 },
-    { question: "¿Qué haces si descubres que alguien está incumpliendo las normas éticas?", answers: ["Lo informo", "Lo ignoro", "Le advierto", "Lo enfrento"], correctAnswer: 0 },
-    { question: "¿Qué opinas de la importancia de la formación continua en el trabajo?", answers: ["Muy importante", "Poco importante", "Moderadamente importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Qué harías si tuvieras que enfrentar una decisión difícil en el trabajo?", answers: ["Reflexiono y evalúo opciones", "Tomo la decisión rápidamente", "Pido ayuda", "La evito"], correctAnswer: 0 },
-    { question: "¿Cómo reaccionas si un compañero de trabajo te critica en público?", answers: ["Mantengo la calma y hablo después", "Lo confronto", "Lo ignoro", "Le devuelvo la crítica"], correctAnswer: 0 },
-    { question: "¿Qué tan importante es para ti la responsabilidad social de la empresa?", answers: ["Muy importante", "Poco importante", "Moderadamente importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Qué harías si tienes una idea innovadora para mejorar el trabajo?", answers: ["La propongo", "La guardo", "La comparto con colegas", "La aplico sin permiso"], correctAnswer: 0 },
-    { question: "¿Qué tan importante es para ti el respeto entre colegas?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Qué haces si tu trabajo se ve afectado por un problema personal?", answers: ["Pido un tiempo para resolverlo", "Ignoro el problema", "Busco apoyo en el trabajo", "Dejo que me afecte"], correctAnswer: 0 },
-    { question: "¿Cómo defines un ambiente laboral positivo?", answers: ["Respeto y colaboración", "Alta competencia", "Poca supervisión", "Orientado a resultados"], correctAnswer: 0 },
-    { question: "¿Qué harías si un proyecto en el que trabajas fracasa?", answers: ["Analizo los errores", "Busco culpables", "Lo olvido", "Me siento mal sin actuar"], correctAnswer: 0 },
-    { question: "¿Qué tan importante es para ti recibir retroalimentación constructiva?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Qué harías si necesitas mejorar una habilidad específica para tu puesto?", answers: ["Busco formación", "Ignoro la necesidad", "Delego el trabajo", "Cambio de puesto"], correctAnswer: 0 },
-    { question: "¿Qué opinas sobre trabajar bajo presión?", answers: ["Me motiva", "Me estresa", "No afecta mi rendimiento", "Depende de la situación"], correctAnswer: 0 },
-    { question: "¿Qué haces si observas una injusticia en el trabajo?", answers: ["Lo informo", "Lo ignoro", "Busco ayuda", "Habla con los involucrados"], correctAnswer: 0 },
-    { question: "¿Qué tan importante es para ti la flexibilidad laboral?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Cómo enfrentas un problema inesperado en el trabajo?", answers: ["Analizo y busco soluciones", "Me estreso", "Lo ignoro", "Lo delego"], correctAnswer: 0 },
-    { question: "¿Qué haces si descubres que alguien no está siendo honesto en el trabajo?", answers: ["Habla con la persona", "Lo ignoro", "Lo informo a un superior", "Le doy otra oportunidad"], correctAnswer: 0 },
-    { question: "¿Qué importancia tiene la confianza en el trabajo para ti?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Cómo reaccionas si un proyecto requiere más esfuerzo del que esperabas?", answers: ["Me esfuerzo más", "Busco ayuda", "Delego tareas", "Lo abandono"], correctAnswer: 0 },
-    { question: "¿Qué tan importante es la puntualidad en el trabajo?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Qué harías si recibes un comentario negativo sobre tu desempeño?", answers: ["Lo tomo como aprendizaje", "Lo ignoro", "Me desanimo", "Busco excusas"], correctAnswer: 0 },
-    { question: "¿Qué tan importante es para ti tener metas claras en el trabajo?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Cómo manejas la competencia entre colegas?", answers: ["Me enfoco en mejorar", "Compito agresivamente", "Ignoro la competencia", "Busco trabajar juntos"], correctAnswer: 0 },
-    { question: "¿Qué harías si descubres que otro departamento tiene mejores resultados?", answers: ["Analizo qué hacen bien", "Me siento celoso", "Ignoro la situación", "Busco trabajar con ellos"], correctAnswer: 0 },
-    { question: "¿Qué tan importante es para ti la coherencia en las decisiones de la empresa?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Qué haces si necesitas apoyo en una tarea?", answers: ["Lo pido", "Me esfuerzo solo", "Evito hacer la tarea", "Delego"], correctAnswer: 0 },
-    { question: "¿Cómo te sientes al delegar tareas a otros?", answers: ["Me gusta colaborar", "Prefiero hacer todo yo", "Desconfío", "No me afecta"], correctAnswer: 0 },
-    { question: "¿Qué importancia tiene para ti la confidencialidad en el trabajo?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Qué haces si necesitas tomar una decisión rápida en el trabajo?", answers: ["Analizo y actúo", "Dudo mucho", "Lo consulto con otros", "Evito decidir"], correctAnswer: 0 },
-    { question: "¿Qué harías si observas que una práctica en la empresa no es ética?", answers: ["Lo reporto", "Lo ignoro", "Lo comento con colegas", "Me adapto"], correctAnswer: 0 },
-    { question: "¿Qué tan importante es para ti el reconocimiento en el trabajo?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Cómo te sientes cuando recibes críticas de tu jefe?", answers: ["Lo tomo de forma constructiva", "Me siento afectado", "Lo ignoro", "Me desmotivo"], correctAnswer: 0 },
-    { question: "¿Qué haces si te asignan una tarea fuera de tu experiencia?", answers: ["Aprendo lo necesario", "Me quejo", "La delego", "La rechazo"], correctAnswer: 0 },
-    { question: "¿Cómo manejas el estrés cuando tienes múltiples tareas pendientes?", answers: ["Organizo mi tiempo", "Lo ignoro", "Me estreso mucho", "Delego algunas tareas"], correctAnswer: 0 },
-    { question: "¿Qué importancia tiene la comunicación efectiva en el trabajo para ti?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Qué haces si te das cuenta de un error en un proyecto entregado?", answers: ["Informo a mi jefe", "Espero a que alguien lo note", "Lo ignoro", "Intento solucionarlo sin avisar"], correctAnswer: 0 },
-    { question: "¿Cómo enfrentas las críticas negativas de tus compañeros?", answers: ["Lo tomo de forma constructiva", "Me siento ofendido", "Las ignoro", "Me defiendo"], correctAnswer: 0 },
-    { question: "¿Qué harías si un colega toma crédito por tu trabajo?", answers: ["Hablo con él", "Lo informo a un superior", "Lo dejo pasar", "Intento obtener reconocimiento en privado"], correctAnswer: 0 },
-    { question: "¿Qué tan importante es para ti la transparencia en la empresa?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Qué haces si no estás de acuerdo con una decisión de tu equipo?", answers: ["Expreso mi opinión", "La acepto sin cuestionar", "La ignoro", "Busco apoyo de otros"], correctAnswer: 0 },
-    { question: "¿Cómo equilibras tu vida personal y laboral?", answers: ["Organizo mis horarios", "Dedico más tiempo al trabajo", "Me desconecto después de trabajar", "No lo hago"], correctAnswer: 0 },
-    { question: "¿Qué importancia tiene para ti la empatía en el lugar de trabajo?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Qué haces si recibes una tarea que consideras fuera de tu responsabilidad?", answers: ["Lo hago de todas formas", "Hablo con mi jefe", "La rechazo", "Intento delegarla"], correctAnswer: 0 },
-    { question: "¿Qué tan importante es la confianza en la relación con tus superiores?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Cómo reaccionas ante cambios repentinos en el trabajo?", answers: ["Me adapto rápidamente", "Me estreso", "Resisto al cambio", "Lo tomo con calma"], correctAnswer: 0 },
-    { question: "¿Qué haces si tienes una carga de trabajo excesiva?", answers: ["Pido ayuda", "La asumo sin quejarme", "Intento delegar", "Lo hablo con mi jefe"], correctAnswer: 0 },
-    { question: "¿Qué tan importante es el crecimiento profesional en tu vida laboral?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Qué harías si observas un trato injusto hacia un colega?", answers: ["Lo reporto", "Lo ignoro", "Habla con el colega", "Lo comento con otros"], correctAnswer: 0 },
-    { question: "¿Qué importancia tiene para ti recibir una retroalimentación honesta?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Cómo te sientes cuando otros dependen de ti para completar su trabajo?", answers: ["Me siento motivado", "Me estreso", "Me siento indiferente", "Prefiero que no lo hagan"], correctAnswer: 0 },
-    { question: "¿Qué tan importante es para ti tener un propósito en el trabajo?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Qué haces si te sientes agotado mentalmente en el trabajo?", answers: ["Tomo un descanso", "Continúo sin parar", "Pido días libres", "Cambio de actividad"], correctAnswer: 0 },
-    { question: "¿Qué tan importante es la seguridad laboral para ti?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Cómo reaccionas cuando otro equipo tiene mejores resultados?", answers: ["Me motivo a mejorar", "Siento envidia", "Ignoro la situación", "Busco aprender de ellos"], correctAnswer: 0 },
-    { question: "¿Qué tan importante es la cultura de la empresa para ti?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Qué harías si tu jefe te pide hacer algo que no estás seguro de cómo hacer?", answers: ["Pido aclaración", "Lo intento de todas formas", "Lo delego", "Lo hago a mi manera"], correctAnswer: 0 },
-    { question: "¿Qué harías si descubres que tu colega no ha cumplido con su parte del trabajo?", answers: ["Lo hablo con él", "Lo informo al jefe", "Lo hago yo mismo", "Lo ignoro"], correctAnswer: 0 },
-    { question: "¿Qué haces si necesitas más tiempo para una tarea asignada?", answers: ["Solicito una extensión", "Trabajo más rápido", "Pido ayuda", "La entrego incompleta"], correctAnswer: 0 },
-    { question: "¿Qué tan importante es la proactividad en el trabajo para ti?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Cómo te sientes al tener que liderar a tus colegas?", answers: ["Motivado", "Estresado", "Indiferente", "Evitativo"], correctAnswer: 0 },
-    { question: "¿Qué haces si sientes que no estás cumpliendo con tus propias expectativas?", answers: ["Me esfuerzo más", "Me doy tiempo", "Lo ignoro", "Lo hablo con alguien"], correctAnswer: 0 },
-    { question: "¿Qué tan importante es la innovación en tu vida laboral?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Qué harías si tienes la oportunidad de liderar un nuevo proyecto?", answers: ["Acepto con gusto", "Rechazo la oferta", "Lo pienso mucho", "Lo hago con dudas"], correctAnswer: 0 },
-    { question: "¿Qué tan importante es para ti tener un equipo colaborativo?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Cómo reaccionas si recibes menos reconocimiento del que esperabas?", answers: ["Lo acepto", "Me desmotivo", "Me quejo", "Intento destacarme más"], correctAnswer: 0 },
-    { question: "¿Qué tan importante es para ti la ética profesional?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Qué haces si tienes ideas para mejorar tu equipo?", answers: ["Las comparto", "Las guardo", "Las aplico yo mismo", "Espero el momento adecuado"], correctAnswer: 0 },
-    { question: "¿Cómo te sientes cuando trabajas en un ambiente competitivo?", answers: ["Motivado", "Estresado", "Indiferente", "Mejor evito la competencia"], correctAnswer: 0 },
-    { question: "¿Qué tan importante es la claridad en las metas laborales para ti?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 },
-    { question: "¿Qué harías si descubres una oportunidad de mejorar el trabajo de tu equipo?", answers: ["La propongo", "La aplico solo", "La comento con un superior", "Espero a que alguien más la note"], correctAnswer: 0 },
-    { question: "¿Cómo reaccionas si un compañero recibe un ascenso en lugar de ti?", answers: ["Felicito y aprendo", "Me siento desmotivado", "Me quejo con el jefe", "Lo ignoro"], correctAnswer: 0 },
-    { question: "¿Qué tan importante es el respeto hacia los superiores para ti?", answers: ["Muy importante", "Moderadamente importante", "Poco importante", "Nada importante"], correctAnswer: 0 }
 
 
-        ];
+    {
+        question: "¿Qué harías si no estás de acuerdo con tus días de descanso?",
+        answers: [
+            "Hablarías con tu jefe para ajustarlos",
+            "Aceptarías el cronograma aunque no estés conforme",
+            "Intercambiarías días con un compañero",
+            "Solicitarías cambios directamente a Recursos Humanos"
+        ],
+        correctAnswer: 0
+    },
+    {
+        question: "¿Cómo actuarías si notas que las normas de seguridad no se cumplen?",
+        answers: [
+            "Lo reportarías de inmediato para prevenir accidentes",
+            "Hablarías con tus compañeros para corregirlo",
+            "Esperarías que la empresa lo note sola",
+            "Ignorarías el problema para evitar conflictos"
+        ],
+        correctAnswer: 0
+    },
+
+    { 
+        question: "Si un compañero te pide ayuda para terminar su tarea, ¿qué harías?", 
+        answers: [
+            "Ayudarías solo si tienes tiempo disponible y tu tarea está al día",
+            "Ayudarías aunque eso retrase tu propio trabajo",
+            "Le dirías que se ayude a sí mismo",
+            "Buscarías a un superior para delegar la ayuda"
+        ],
+        correctAnswer: 1
+    },
+    {
+        question: "¿Qué harías si no estás de acuerdo con la asignación de tus tareas?",
+        answers: [
+            "Propondrías una solución alternativa de manera respetuosa",
+            "Rechazarías las tareas asignadas",
+            "Aceptarías sin decir nada",
+            "Aceptarías pero te quejarías en privado"
+        ],
+        correctAnswer: 3
+    },
+    { 
+        question: "Si un compañero te pide ayuda para terminar su tarea, ¿qué harías?", 
+        answers: [
+            "Ayudarías solo si tienes tiempo disponible y tu tarea está al día",
+            "Ayudarías aunque eso retrase tu propio trabajo",
+            "Le dirías que se ayude a sí mismo",
+            "Buscarías a un superior para delegar la ayuda"
+        ],
+        correctAnswer: 0
+    },
+    {
+        question: "¿Qué harías si no estás de acuerdo con la asignación de tus tareas?",
+        answers: [
+            "Propondrías una solución alternativa de manera respetuosa",
+            "Rechazarías las tareas asignadas",
+            "Aceptarías sin decir nada",
+            "Aceptarías pero te quejarías en privado"
+        ],
+        correctAnswer: 3
+    },
+    {
+        question: "Si se te ofrece un ascenso con más responsabilidades, pero también con más presión, ¿cómo lo manejarías?",
+        answers: [
+            "Aceptarías el ascenso, pero buscando estrategias para manejar la presión",
+            "Aceptarías el ascenso sin pensarlo mucho",
+            "Rechazarías el ascenso por miedo a la presión",
+            "Esperarías más tiempo para aceptar el ascenso"
+        ],
+        correctAnswer: 1
+    },
+
+
+    { question: "¿Qué harías si te sientes abrumado por tus responsabilidades?", answers: ["Ignorar la carga", "Pedir ayuda", "Priorizar tareas", "Renunciar"], correctAnswer: 2 },
+
+    { question: "¿Qué tan importante es para ti el equilibrio entre trabajo y vida personal?", answers: ["Poco importante", "Moderadamente importante", "Nada importante", "Muy importante"], correctAnswer: 3 },
+
+    { question: "¿Cómo manejas las críticas constructivas?", answers: ["Las ignoro", "Aprendo de ellas", "Me pongo a la defensiva", "Las rechazo"], correctAnswer: 1 },
+
+    { question: "¿Qué haces si un cliente no está satisfecho con tu trabajo?", answers: ["Ignoro el problema", "Lo reporto", "Le ofrezco una solución", "Evito la responsabilidad"], correctAnswer: 2 },
+
+    { question: "¿Qué tan cómodo te sientes con los cambios en tu entorno laboral?", answers: ["Algo incómodo", "Muy incómodo", "Neutral", "Muy cómodo"], correctAnswer: 3 },
+
+    { question: "¿Qué harías si tienes un problema personal que interfiere con tu desempeño?", answers: ["Busco ayuda profesional",  "Lo comunico a mi jefe", "Lo ignoro", "Me tomo un descanso"], correctAnswer: 1 },
+
+    {
+        question: "Si tienes problemas con el ambiente de trabajo, ¿cómo los abordarías?",
+        answers: [
+            "Buscarías conversar con tu superior para mejorar las condiciones",
+            "Dejarías que el tiempo lo solucione por sí solo",
+            "Hablarías con los compañeros para quejarte",
+            "Buscarías trabajo en otro lugar"
+        ],
+        correctAnswer: 0
+    },
+    {
+        question: "Si un compañero no cumple con su trabajo y afecta el desempeño de todo el equipo, ¿cómo reaccionarías?",
+        answers: [
+            "Informarías de manera profesional la situación a tu supervisor",
+            "Intentarías solucionar el problema directamente con el compañero",
+            "Aceptarías la situación y continuarías con tus tareas",
+            "Evitarías involucrarte en el problema"
+        ],
+        correctAnswer: 2
+    },
+    {
+        question: "Si te piden realizar una tarea fuera de tu área de conocimiento, ¿qué harías?",
+        answers: [
+            "Buscarías aprender lo necesario para realizarla correctamente",
+            "Rechazarías la tarea porque no es de tu área",
+            "Solicitarías ayuda de otro compañero",
+            "Aceptarías la tarea pero sin el compromiso de hacerlo bien"
+        ],
+        correctAnswer: 1
+    },
+    {
+        question: "Si un cliente te exige algo que sabes que no es posible, ¿cómo lo manejarías?",
+        answers: [
+            "Le explicarías la situación de manera clara y ofrecerías alternativas",
+            "Le dirías que no puedes hacer nada y cerrarías la conversación",
+            "Le ofrecerías algo similar que no sea lo que pidió",
+            "Ignorarías la solicitud si no es urgente"
+        ],
+        correctAnswer: 0
+    },
+    {
+        question: "Si te asignan una tarea muy compleja con un plazo corto, ¿qué harías?",
+        answers: [
+            "Te organizarías y trabajarías con eficiencia para cumplir con el plazo",
+            "Rechazarías la tarea por no tener suficiente tiempo",
+            "Propondrías un plazo más largo para hacerla bien",
+            "Le pedirías más instrucciones antes de empezar"
+        ],
+        correctAnswer: 3
+    },
+    { question: "¿Cómo defines la ética en el trabajo?", answers: ["Cumplir con la ley", "Ser honesto y justo", "Seguir órdenes", "Evitar conflictos"], correctAnswer: 1 },
+
+    { question: "¿Qué harías si tienes un conflicto con un colega?", answers: ["Ignorarlo", "Reportarlo a un superior", "Pedir ayuda a otros colegas", "Conversar con él"], correctAnswer: 3 },
+
+    { question: "¿Qué haces si un proyecto no se desarrolla como esperabas?", answers: ["Abandono el proyecto", "Dejo que otros se encarguen", "Analizo y ajusto el plan", "Me frustro y sigo igual"], correctAnswer: 2 },
+
+    { question: "¿Qué harías si no te sientes valorado en el trabajo?", answers: ["Buscar otro trabajo", "Hablar con mi jefe", "Ignorar la situación", "Trabajar más duro"], correctAnswer: 1 },
+
+    { question: "¿Qué tan importante es para ti el trabajo en equipo?", answers: ["Muy importante", "Poco importante", "Moderadamente importante", "Nada importante"], correctAnswer: 0 },
+ 
+
+];
+
 
         let filteredQuestions = questions;
 
