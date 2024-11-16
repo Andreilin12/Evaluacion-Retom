@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eliminar Resultados</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #141e30, #243b55);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .delete-btn {
+            background: #e91e63;
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 30px;
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(233, 30, 99, 0.5);
+            transition: all 0.3s ease;
+        }
+        .delete-btn:hover {
+            background: #c2185b;
+            box-shadow: 0 6px 20px rgba(233, 30, 99, 0.7);
+        }
+        .delete-btn:disabled {
+            background: #b0bec5;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .loading-icon {
+            border: 4px solid transparent;
+            border-top: 4px solid #fff;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .alert {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #4caf50;
+            color: #fff;
+            padding: 15px 30px;
+            border-radius: 20px;
+            font-size: 1em;
+            display: none;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.5);
+        }
+        .alert.show {
+            display: block;
+            animation: fadeInOut 3s ease forwards;
+        }
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            10%, 90% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <button class="delete-btn" id="delete-btn">
+        <span class="icon">🗑️</span>
+        <span class="text">Eliminar Resultados</span>
+        <div class="loading-icon" id="loading-icon"></div>
+    </button>
+    <div class="alert" id="alert">¡Resultados eliminados con éxito!</div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCFfkmEDjqAwJNtnKByRQNt9NUQs5UdNa0",
+            authDomain: "rrhh-ee7e3.firebaseapp.com",
+            projectId: "rrhh-ee7e3",
+            storageBucket: "rrhh-ee7e3.appspot.com",
+            messagingSenderId: "605891607617",
+            appId: "1:605891607617:web:daedbd7b7b5a8b901ac0",
+            measurementId: "G-Q801R9M95S"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const deleteBtn = document.getElementById("delete-btn");
+        const loadingIcon = document.getElementById("loading-icon");
+        const alertBox = document.getElementById("alert");
+
+        deleteBtn.addEventListener("click", async () => {
+            deleteBtn.disabled = true;
+            loadingIcon.style.display = "inline-block";
+
+            try {
+                const resultsSnapshot = await getDocs(collection(db, "results"));
+                const deletePromises = resultsSnapshot.docs.map(docSnap => deleteDoc(doc(db, "results", docSnap.id)));
+                await Promise.all(deletePromises);
+
+                alertBox.classList.add("show");
+            } catch (error) {
+                console.error("Error al eliminar los resultados:", error);
+                alertBox.textContent = "Error al eliminar resultados.";
+                alertBox.style.background = "#f44336";
+                alertBox.classList.add("show");
+            } finally {
+                deleteBtn.disabled = false;
+                loadingIcon.style.display = "none";
+            }
+        });
+    </script>
+</body>
+</html>
