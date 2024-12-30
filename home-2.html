@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RETOM.el</title>
-    <link rel="icon" href="//firebasestorage.googleapis.com/v0/b/rrhh-ee7e3.appspot.com/o/RETOM%20COMPLETO%20(2).png?alt=media&token=2e334ae1-57f3-4d8f-a8fd-b410e54f1236" alt=" type="image/x-icon">
-    <!-- Si tu favicon está en una carpeta, ajusta la ruta -->
-    <!-- <link rel="icon" href="images/favicon.ico" type="image/x-icon"> -->
+    <link rel="icon" href="//firebasestorage.googleapis.com/v0/b/rrhh-ee7e3.appspot.com/o/RETOM%20COMPLETO%20(2).png?alt=media&token=2e334ae1-57f3-4d8f-a8fd-b410e54f1236" type="image/x-icon">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 
@@ -15,241 +13,183 @@
             font-family: 'Roboto', sans-serif; 
             margin: 0;
             padding: 0;
-            background: url('https://firebasestorage.googleapis.com/v0/b/rrhh-ee7e3.appspot.com/o/Reton%20logo%20fondo%20web.png?alt=media&token=0cd390e7-d6a5-4e9d-a0b1-7300d0348002') no-repeat center center fixed;
-            background-size: cover;
+            background: linear-gradient(135deg, #1a1a1d, #0f2027);
             color: white;
-            transition: background-color 0.3s ease;
+            overflow-x: hidden;
         } 
         
         /* Estilos del Header */
         header {
-            background: rgba(0, 0, 0, 0.5);
-            padding: 20px 0;
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
         
         header h1 {
-            margin: 0;
-            font-size: 2.5em;
-            text-transform: uppercase;
+            font-size: 2em;
             color: #16E086;
+            margin: 0;
         }
 
-        /* Menú de Navegación */
         nav {
             display: flex;
-            justify-content: center;
             gap: 20px;
-            margin-top: 30px;
-            flex-wrap: wrap;
-            justify-content: space-around;
         }
 
         nav a {
             text-decoration: none;
-            color: #000;
-            font-size: 1.2em;
-            padding: 10px 20px;
-            border-radius: 30px;
-            transition: background-color 0.3s ease, transform 0.3s ease;
-        } 
-
-        nav a:hover {
-            background-color: #15a085;
-            transform: scale(1.1);
+            font-size: 1.1em;
+            color: #ffffff;
+            padding: 8px 15px;
+            border: 2px solid transparent;
+            border-radius: 20px;
+            transition: 0.3s;
         }
 
-        /* Estilo de los iconos */
+        nav a:hover {
+            background-color: #16E086;
+            color: #000;
+            border-color: #16E086;
+        }
+
+        /* Contenedor de íconos */
         .icon-container {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-top: 50px;
-            justify-items: center;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            margin: 50px auto;
+            max-width: 1200px;
         }
 
         .icon {
-            background: rgba(0, 0, 0, 0.5);
-            padding: 20px;
-            border-radius: 50%;
-            font-size: 3em;
-            text-align: center;
-            color: white;
-            transition: background-color 0.3s ease, transform 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            width: 80px;
-            height: 80px;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            width: 150px;
+            height: 150px;
+            transition: transform 0.3s ease, background 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
         }
 
         .icon:hover {
-            background-color: #00d4ff;
+            background: rgba(22, 224, 134, 0.3);
             transform: scale(1.1);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
         }
 
-        /* Icono del modo */
-        #mode-toggle {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 1.5em;
-            cursor: pointer;
-            color: white;
-            transition: transform 0.3s ease;
+        .icon i {
+            font-size: 3em;
+            color: #16E086;
         }
 
-        /* Estilos del footer */
+        .icon span {
+            margin-top: 10px;
+            font-size: 1.1em;
+            color: #fff;
+        }
+
         footer {
-            position: fixed;
-            bottom: 10px;
-            width: 100%;
             text-align: center;
-            font-size: 1em;
-            color: #15a085;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #16E086;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
         }
 
-        /* Estilos Modo Oscuro */
-        .dark-mode {
-            background-color: #2C3E50;
-            color: #e0e0e0;
-        }
-
-        .dark-mode nav a {
-            color: #e0e0e0;
-        }
-
-        .dark-mode .icon {
-            background: #333333;
-        }
-        
         /* Estilos Responsivos */
         @media (max-width: 768px) {
-            header h1 {
-                font-size: 2em;
-            }
-
             .icon {
+                width: 120px;
+                height: 120px;
+            }
+
+            .icon i {
                 font-size: 2.5em;
-                padding: 15px;
-                width: 70px;
-                height: 70px;
             }
+        }
 
-            nav a {
-                font-size: 1em;
-                padding: 8px 16px;
-            }
-
-            /* Ajustar el menú para pantallas pequeñas */
+        @media (max-width: 480px) {
             nav {
                 flex-direction: column;
                 align-items: center;
             }
 
-            /* Iconos en 2 por fila */
-            .icon-container {
-                grid-template-columns: repeat(2, 1fr); /* Dos iconos por fila */
-            }
-        }
-
-        @media (min-width: 769px) {
-            .icon {
-                font-size: 3em; /* Más grande en pantallas grandes */
-            }
-
             nav a {
-                font-size: 1.2em;
+                font-size: 1em;
             }
 
-            .icon-container {
-                grid-template-columns: repeat(4, 1fr); /* Cuatro iconos por fila */
+            .icon {
+                width: 100px;
+                height: 100px;
+            }
+
+            .icon i {
+                font-size: 2em;
             }
         }
+
+ /* Para quitar el subrayado de los botones */
+button {
+  text-decoration: none;
+}
+
+/* Para quitar el subrayado de los enlaces */
+a {
+  text-decoration: none;
+}
+
+/* Para quitar el subrayado de los iconos dentro de los enlaces */
+a i {
+  text-decoration: none;
+}
+
     </style>
 </head>
 <body>
-
     <header>
         <h1>RETOM</h1>
-        <div id="mode-toggle"><i class="fas fa-moon"></i></div>
+        <nav>
+            <a href="enlace.html">Evaluaciones</a>
+            <a href="resultados.html">Resultados</a>
+            <a href="configuracion.html">Configuración</a>
+        </nav>
     </header>
-
-    <nav>
-        <a href="enlace.html">Evaluaciones</a>
-        <a href="resultados.html">Resultados</a>
-        <a href="configuracion.html">Configuración</a>
-    </nav>
 
     <div class="icon-container">
         <a href="registrar-usuario.html" class="icon">
             <i class="fas fa-pencil-alt"></i>
+            <span>Registrar </span>
         </a>
         <a href="lista-de-preguntas.html" class="icon">
             <i class="fas fa-chart-bar"></i>
+            <span>Preguntas</span>
         </a>
         <a href="calendario.html" class="icon">
             <i class="fas fa-calendar-alt"></i>
+            <span>Calendario</span>
         </a>
-        <a href="perfil.html" class="icon">
-            <i class="fas fa-user"></i>
+        <a href="registro-de-horas" class="icon">
+            <i class="fas fa-clock"></i>
+            <span>Reg. de Tiempo</span>
         </a>
+
         <a href="token.html" class="icon">
-            <i class="fas fa-key"></i> <!-- Icono de token -->
+            <i class="fas fa-key"></i>
+            <span>Token</span>
         </a>
     </div>
 
     <footer>
         <p>&copy; 2024 Retom, Todos los derechos reservados</p>
     </footer>
-
-    <!-- Script de Firebase y JavaScript -->
-    <script type="module">
-        // Importa las funciones necesarias de Firebase
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
-
-        // Configuración de Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyCFfkmEDjqAwJNtnKByRQNt9NUQs5UdNa0",
-            authDomain: "rrhh-ee7e3.firebaseapp.com",
-            projectId: "rrhh-ee7e3",
-            storageBucket: "rrhh-ee7e3.appspot.com",
-            messagingSenderId: "605891607617",
-            appId: "1:605891607617:web:daedbd7b7b5a8b901ac0",
-            measurementId: "G-Q801R9M95S"
-        };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        // Alternar el modo oscuro y claro
-        const modeToggle = document.getElementById("mode-toggle");
-        const body = document.body;
-
-        // Función para aplicar el modo almacenado en Firebase
-        async function applyMode() {
-            const docRef = doc(db, "settings", "userMode");
-            const docSnap = await getDoc(docRef);
-
-            if (docSnap.exists()) {
-                const mode = docSnap.data().darkMode;
-                body.classList.toggle("dark-mode", mode);
-                modeToggle.innerHTML = mode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-            }
-        }
-
-        // Evento para alternar el modo y guardarlo en Firebase
-        modeToggle.addEventListener("click", async () => {
-            const isDarkMode = body.classList.toggle("dark-mode");
-            modeToggle.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-            await setDoc(doc(db, "settings", "userMode"), { darkMode: isDarkMode });
-        });
-
-        // Inicializar el modo al cargar la página
-        applyMode();
-    </script>
-
 </body>
 </html>
