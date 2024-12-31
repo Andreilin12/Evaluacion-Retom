@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    
+
+    <title>retom.el</title>
+
+    <link rel="icon" href="//firebasestorage.googleapis.com/v0/b/rrhh-ee7e3.appspot.com/o/RETOM%20COMPLETO%20(2).png?alt=media&token=2e334ae1-57f3-4d8f-a8fd-b410e54f1236" alt=" type="image/x-icon">
+
+    <!-- Si tu favicon está en una carpeta, ajusta la ruta -->
+
+    <!-- <link rel="icon" href="images/favicon.ico" type="image/x-icon"> -->
+
+    <style>
+
+        /* General Styles */
+
+        * {
+
+            box-sizing: border-box;
+
+            margin: 0;
+
+            padding: 0;
+
+        }
+
+
+
+        body, html {
+
+            height: 100%;
+
+            font-family: 'Arial', sans-serif;
+
+            background: #0f0c29;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            overflow: hidden;
+
+        }
+
+
+
+        .welcome-container {
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+            justify-content: center;
+
+            text-align: center;
+
+            width: 100%;
+
+            height: 100%;
+
+            color: #ffffff;
+
+            padding: 20px;
+
+        }
+
+
+
+        /* Logo Styling */
+
+        .logo {
+
+            width: 150px;
+
+            height: auto;
+
+            opacity: 0;
+
+            animation: fadeInLogo 2s forwards;
+
+        }
+
+
+
+        /* Title Styling */
+
+        .title {
+
+            font-size: 1.8em;
+
+            margin-top: 20px;
+
+            color: #00d4ff;
+
+            opacity: 0;
+
+            animation: fadeInTitle 2s 1s forwards, pulse 1.5s infinite 3.5s;
+
+            max-width: 90%;
+
+        }
+
+
+
+        /* Loading Bar */
+
+        .loading-bar-container {
+
+            position: relative;
+
+            width: 70%;
+
+            max-width: 600px;
+
+            height: 10px;
+
+            background: #333;
+
+            border-radius: 5px;
+
+            margin-top: 40px;
+
+            overflow: hidden;
+
+        }
+
+
+
+        .loading-bar {
+
+            position: absolute;
+
+            height: 100%;
+
+            width: 0%;
+
+            background: linear-gradient(90deg, #00ff6a, #00d4ff);
+
+            animation: loading 7s forwards;
+
+        }
+
+
+
+        /* Animations */
+
+        @keyframes fadeInLogo {
+
+            from { opacity: 0; transform: scale(0.8); }
+
+            to { opacity: 1; transform: scale(1); }
+
+        }
+
+
+
+        @keyframes fadeInTitle {
+
+            from { opacity: 0; transform: translateY(-30px); }
+
+            to { opacity: 1; transform: translateY(0); }
+
+        }
+
+
+
+        @keyframes pulse {
+
+            0%, 100% { transform: scale(1); }
+
+            50% { transform: scale(1.1); }
+
+        }
+
+
+
+        @keyframes loading {
+
+            0% { width: 0%; }
+
+            100% { width: 100%; }
+
+        }
+
+
+
+        /* Media Queries */
+
+        @media (max-width: 768px) {
+
+            .logo { width: 100px; }
+
+            .title { font-size: 1.4em; }
+
+            .loading-bar-container { width: 90%; }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="welcome-container">
+
+        <!-- Logo Image -->
+
+        <img src="https://firebasestorage.googleapis.com/v0/b/rrhh-ee7e3.appspot.com/o/logo%2Fimages%20(1).png?alt=media&token=e71735a8-036a-47d0-bac5-333928017c79" alt="Logo" class="logo">
+
+        
+
+        <!-- Title Text -->
+
+        <div class="title">Playa Palmera</div>
+
+
+
+        <!-- Loading Bar -->
+
+        <div class="loading-bar-container">
+
+            <div class="loading-bar"></div>
+
+        </div>
+
+    </div>
+
+
+
+    <script>
+
+        // Redirection after animation ends
+
+        setTimeout(() => {
+
+            window.location.href = "ponche-ponche.html";
+
+        }, 7000); // 7 seconds to complete animation
+
+    </script>
+
+</body>
+
+</html>
