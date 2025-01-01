@@ -1,0 +1,390 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>  
+    <meta charset="UTF-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de tiempos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body { 
+            font-family: 'Roboto', sans-serif;
+            background-color: #2c3e50;
+            margin: 0;
+            padding: 0;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            background: linear-gradient(45deg, #2c3e50, #2c3e50);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 15px 25px rgba(255, 255, 255), 0 5px 10px rgba(255, 255, 255);
+        }
+
+        h1 {
+            text-align: center;
+            color: #fff;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(21, 160, 135);
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .search-box input {
+            padding: 12px;
+            font-size: 18px;
+            width: 70%;
+            max-width: 400px;
+            border-radius: 8px;
+            border: 2px solid #15a086;
+            background: transparent;
+            color: #fff;
+            outline: none;
+            transition: border 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+
+        .search-box input:focus {
+            border-color: #fff;
+            box-shadow: 0 0 15px rgba(255, 255, 255);
+        }
+
+        .collaborator-folder {
+            margin: 20px 0;
+            cursor: pointer;
+            background: #15a086;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.4);
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .collaborator-folder:hover {
+            background: #16e086;
+            transform: translateY(-5px);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #2c3e50;
+            padding: 20px;
+            border-radius: 15px;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80%;
+            overflow-y: auto;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255, 255, 255);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #15a086;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: #ffff;
+        }
+
+        .confirmation-btn {
+            background-color: #e74c3c;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .confirmation-btn:hover {
+            background-color: #c0392b;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border-radius: 10px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #444;
+        }
+
+        th {
+            background-color: #15a086;
+            color: #000;
+            text-transform: uppercase;
+        }
+
+        td {
+            background-color: #222222;
+            color: #b0e0e6;
+        }
+
+
+  /* Desactivar la selección de texto y el efecto de arrastre en todos los elementos */
+ * {
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE 10+ */
+  user-select: none; /* estándar */
+
+  -webkit-user-drag: none; /* Safari */
+  -khtml-user-drag: none; /* Konqueror HTML */
+  -moz-user-drag: none; /* Firefox */
+  -o-user-drag: none; /* Opera */
+  user-drag: none; /* estándar */
+   }
+
+.back-button {
+    position: fixed;
+    top: 10px; /* Distancia desde la parte superior */
+    left: 10px; /* Distancia desde el borde izquierdo */
+    background-color: #16a085; /* Color de fondo */
+    color: #fff; /* Color del texto y del icono */
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.3s; /* Transición suave para el color de fondo */
+    z-index: 1000; /* Asegura que el botón esté sobre otros elementos */
+}
+
+.back-button i {
+    margin-right: 8px; /* Espacio entre el icono y el texto */
+}
+
+.back-button:hover {
+    background-color: #2c2e50; /* Color de fondo al pasar el ratón */
+}
+    </style>
+</head>
+<body>
+
+     <button class="back-button" onclick="goBack()">
+        <i class="fas fa-arrow-left"></i> Volver
+    </button>  
+
+    <div class="container">
+        <h1>Registro de tiempos</h1>
+        
+        <!-- Buscador -->
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Buscar colaborador por código..." onkeyup="filterCollaborators()">
+        </div>
+
+        <div id="error" class="error"></div>
+        <div id="collaboratorList"></div>
+    </div>
+
+    <!-- Modal para confirmar la eliminación -->
+    <div id="confirmationModal" class="modal">
+        <div class="modal-content">
+            <h2>¿Estás seguro de eliminar a este colaborador?</h2>
+            <button class="confirmation-btn" id="confirmDeleteBtn">Eliminar</button>
+            <button class="close-btn" id="closeModalBtn">&times;</button>
+        </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, where, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBkCVuK8ovujWGJI5OTeOSqmednaXhnHsA",
+        authDomain: "motomovie-peliculas.firebaseapp.com",
+        projectId: "motomovie-peliculas",
+        storageBucket: "motomovie-peliculas.firebasestorage.app",
+        messagingSenderId: "1027127345040",
+        appId: "1:1027127345040:web:0e8c8a86de87ab443cbd15", 
+        measurementId: "G-WY4EYNR19P"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const collaboratorList = document.getElementById("collaboratorList");
+    const errorDiv = document.getElementById("error");
+    const confirmationModal = document.getElementById("confirmationModal");
+    const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+    const closeModalBtn = document.getElementById("closeModalBtn");
+
+    let collaboratorIdToDelete = null;
+
+    // Función para recuperar y mostrar colaboradores
+    const getCollaborators = async () => {
+        try {
+            const querySnapshot = await getDocs(collection(db, "collaborators"));
+            
+            if (querySnapshot.empty) {
+                errorDiv.textContent = "No se encontraron colaboradores.";
+                return;
+            }
+
+            errorDiv.textContent = "";
+            collaboratorList.innerHTML = "";
+
+            querySnapshot.forEach((doc) => {
+                const collaboratorData = doc.data();
+                const collaboratorId = collaboratorData.id; // Campo "id" en Firebase
+                const collaboratorName = collaboratorData.name;
+
+                const collaboratorDiv = document.createElement("div");
+                collaboratorDiv.classList.add("collaborator-folder");
+                collaboratorDiv.innerHTML = `<strong>ID:</strong> ${collaboratorId} - <strong>Nombre:</strong> ${collaboratorName}`;
+                collaboratorDiv.addEventListener("click", () => confirmDeletion(doc.id));
+
+                collaboratorList.appendChild(collaboratorDiv);
+            });
+        } catch (error) {
+            console.error("Error al recuperar colaboradores: ", error);
+        }
+    };
+
+    // Función para buscar colaboradores por el campo "id" o "name"
+    const searchCollaborators = async () => {
+        const searchTerm = document.getElementById("searchInput").value.trim().toLowerCase();
+        collaboratorList.innerHTML = ""; // Limpiar la lista
+        errorDiv.textContent = "";
+
+        if (!searchTerm) {
+            getCollaborators(); // Mostrar todos los colaboradores si no hay búsqueda
+            return;
+        }
+
+        try {
+            const collaboratorsRef = collection(db, "collaborators");
+
+            // Consulta para buscar por "name"
+            const queryByName = query(collaboratorsRef, where("name", ">=", searchTerm), where("name", "<=", searchTerm + '\uf8ff'));
+            const querySnapshotByName = await getDocs(queryByName);
+
+            // Consulta para buscar por "id"
+            const queryById = query(collaboratorsRef, where("id", "==", searchTerm));
+            const querySnapshotById = await getDocs(queryById);
+
+            let foundResults = false;
+
+            // Mostrar resultados de búsqueda por "name"
+            if (!querySnapshotByName.empty) {
+                foundResults = true;
+                querySnapshotByName.forEach((doc) => {
+                    const collaboratorData = doc.data();
+                    const collaboratorId = collaboratorData.id;
+                    const collaboratorName = collaboratorData.name;
+
+                    const collaboratorDiv = document.createElement("div");
+                    collaboratorDiv.classList.add("collaborator-folder");
+                    collaboratorDiv.innerHTML = `<strong>ID:</strong> ${collaboratorId} - <strong>Nombre:</strong> ${collaboratorName}`;
+                    collaboratorDiv.addEventListener("click", () => confirmDeletion(doc.id));
+
+                    collaboratorList.appendChild(collaboratorDiv);
+                });
+            }
+
+            // Mostrar resultados de búsqueda por "id"
+            if (!querySnapshotById.empty) {
+                foundResults = true;
+                querySnapshotById.forEach((doc) => {
+                    const collaboratorData = doc.data();
+                    const collaboratorId = collaboratorData.id;
+                    const collaboratorName = collaboratorData.name;
+
+                    const collaboratorDiv = document.createElement("div");
+                    collaboratorDiv.classList.add("collaborator-folder");
+                    collaboratorDiv.innerHTML = `<strong>ID:</strong> ${collaboratorId} - <strong>Nombre:</strong> ${collaboratorName}`;
+                    collaboratorDiv.addEventListener("click", () => confirmDeletion(doc.id));
+
+                    collaboratorList.appendChild(collaboratorDiv);
+                });
+            }
+
+            if (!foundResults) {
+                errorDiv.textContent = "";
+            }
+        } catch (error) {
+            console.error("Error al buscar colaboradores: ", error);
+            errorDiv.textContent = "Ocurrió un error al realizar la búsqueda.";
+        }
+    };
+
+    // Función para abrir el modal de confirmación de eliminación
+    const confirmDeletion = (id) => {
+        collaboratorIdToDelete = id;
+        confirmationModal.style.display = "flex";
+    };
+
+    // Función para eliminar el colaborador
+    const deleteCollaborator = async () => {
+        if (!collaboratorIdToDelete) return;
+
+        try {
+            await deleteDoc(doc(db, "collaborators", collaboratorIdToDelete));
+            alert("Colaborador eliminado exitosamente.");
+            confirmationModal.style.display = "none";
+            getCollaborators(); // Recargar la lista de colaboradores
+        } catch (error) {
+            console.error("Error al eliminar colaborador: ", error);
+            alert("Error al eliminar colaborador.");
+        }
+    };
+
+    confirmDeleteBtn.addEventListener("click", deleteCollaborator);
+    closeModalBtn.addEventListener("click", () => {
+        confirmationModal.style.display = "none";
+    });
+
+    // Escuchar cambios en el input de búsqueda
+    document.getElementById("searchInput").addEventListener("input", searchCollaborators);
+
+    // Recuperar todos los colaboradores cuando se carga la página
+    window.onload = getCollaborators;
+</script>
+
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+
+
+</body> 
+</html>
