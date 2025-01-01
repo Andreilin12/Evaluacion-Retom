@@ -116,11 +116,27 @@
             opacity: 1;
         }
     }
+ #videoPlayer {
+    width: 600px;
+    height: 300px;
+    object-fit: cover; /* Para que el video se ajuste al contenedor */
+    border: none;      /* Quita bordes si existieran */
+}
+
 </style>
 
 </head>
 <body>
+
+        <!-- Reproductor de video -->
+        <video id="videoPlayer" autoplay muted loop>
+            <source src="https://firebasestorage.googleapis.com/v0/b/formulario-2-8929a.appspot.com/o/flore11.mp4?alt=media&token=42879780-d36c-42f7-aea7-8d8488d9d70e" type="video/mp4">
+            Tu navegador no soporta la reproducción de videos.
+        </video>
+    </div>
     <div class="container">
+
+
 <div id="clock"></div>
 
         <h1>Playa Palmera</h1>
