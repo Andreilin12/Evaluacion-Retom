@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Asistencia y Horarios</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #2c3e50, #2c3e50);
+    margin: 0;
+    padding: 0;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 900px;
+    width: 100%;
+    background: #2c3e50;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+h1 {
+    text-align: center;
+    font-size: 2.5rem;
+    color: #fff;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #2c3e50;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #fff;
+}
+
+th {
+    background: #15a086;
+    color: #fff;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+td {
+    color: #ffffff;
+}
+
+td input {
+    width: 100%;
+    padding: 8px;
+    background: #0f3460;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+td input:focus {
+    outline: 2px solid #fff;
+    background: #162447;
+}
+
+.error {
+    color: #e94560;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.no-records {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #e94560;
+    margin-top: 20px;
+}
+
+button {
+    background: #e94560;
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+button:hover {
+    background: #ff2e63;
+}
+
+button:active {
+    background: #c70039; 
+}
+
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2rem;
+    }
+
+    th, td {
+        padding: 10px;
+    }
+
+    td input {
+        font-size: 0.9rem;
+    }
+}
+
+   
+      /* Desactivar la selección de texto y el efecto de arrastre en todos los elementos */
+* {
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE 10+ */
+  user-select: none; /* estándar */
+
+  -webkit-user-drag: none; /* Safari */
+  -khtml-user-drag: none; /* Konqueror HTML */
+  -moz-user-drag: none; /* Firefox */
+  -o-user-drag: none; /* Opera */
+  user-drag: none; /* estándar */
+ }
+
+        .back-button {
+    position: fixed;
+    top: 10px; /* Distancia desde la parte superior */
+    left: 10px; /* Distancia desde el borde izquierdo */
+    background-color: #16a085; /* Color de fondo */
+    color: #fff; /* Color del texto y del icono */
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.3s; /* Transición suave para el color de fondo */
+    z-index: 1000; /* Asegura que el botón esté sobre otros elementos */
+}
+
+.back-button i {
+    margin-right: 8px; /* Espacio entre el icono y el texto */
+}
+
+.back-button:hover {
+    background-color: #2c2e50; /* Color de fondo al pasar el ratón */
+}
+
+    </style>
+</head>
+<body>
+   
+              <button class="back-button" onclick="goBack()">
+        <i class="fas fa-arrow-left"></i> Volver
+    </button> 
+
+    <div class="container">
+        <h1>Gestión de Asistencia y Horarios</h1>
+        <div id="error" class="error"></div>
+        <div id="noRecords" class="no-records"></div>
+        <table id="historyTable">
+            <thead>
+                <tr>
+                    <th>ID del Colaborador</th>
+                    <th>Acción</th>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Aquí se mostrarán los registros del historial -->
+            </tbody>
+        </table>
+    </div>
+
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, orderBy, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBkCVuK8ovujWGJI5OTeOSqmednaXhnHsA",
+        authDomain: "motomovie-peliculas.firebaseapp.com",
+        projectId: "motomovie-peliculas",
+        storageBucket: "motomovie-peliculas.appspot.com",
+        messagingSenderId: "1027127345040",
+        appId: "1:1027127345040:web:0e8c8a86de87ab443cbd15",
+        measurementId: "G-WY4EYNR19P"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const historyTable = document.getElementById("historyTable").getElementsByTagName('tbody')[0];
+    const errorDiv = document.getElementById("error");
+    const noRecordsDiv = document.getElementById("noRecords");
+
+    const loadSearchHistory = async () => {
+        historyTable.innerHTML = ""; // Limpia la tabla antes de recargar
+        noRecordsDiv.textContent = "";
+        try {
+            const q = query(collection(db, "searchHistory"), orderBy("timestamp", "desc"));
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                noRecordsDiv.textContent = "No hay registros en el historial.";
+                return;
+            }
+
+            querySnapshot.forEach((docSnapshot) => {
+                const data = docSnapshot.data();
+                const docRef = doc(db, "searchHistory", docSnapshot.id); // Referencia exacta del documento
+                const timestamp = data.timestamp.toDate(); // Convertimos el timestamp a Date
+
+                const row = historyTable.insertRow();
+                const cell1 = row.insertCell(0);
+                const cell2 = row.insertCell(1);
+                const cell3 = row.insertCell(2);
+                const cell4 = row.insertCell(3);
+
+                // ID y Acción
+                cell1.textContent = data.id;
+                cell2.textContent = data.action;
+
+                // Fecha
+                const dateInput = document.createElement("input");
+                dateInput.type = "date";
+                dateInput.value = timestamp.toISOString().split("T")[0]; // Formato ISO (YYYY-MM-DD)
+                cell3.appendChild(dateInput);
+
+                // Hora
+                const timeInput = document.createElement("input");
+                timeInput.type = "time";
+                timeInput.value = timestamp.toTimeString().slice(0, 5); // Formato HH:MM
+                cell4.appendChild(timeInput);
+
+                // Guardar cambios en Firebase al salir de los inputs
+                [dateInput, timeInput].forEach((input) => {
+                    input.addEventListener("blur", async () => {
+                        try {
+                            const updatedDate = dateInput.value;
+                            const updatedTime = timeInput.value;
+                            const updatedTimestamp = new Date(`${updatedDate}T${updatedTime}`);
+
+                            const updatedData = {
+                                id: cell1.textContent.trim(),
+                                action: cell2.textContent.trim(),
+                                timestamp: updatedTimestamp,
+                            };
+
+                            // Actualizar en Firebase
+                            await updateDoc(docRef, updatedData);
+                            errorDiv.textContent = "";
+                            console.log("Datos actualizados correctamente en Firebase.");
+                        } catch (error) {
+                            errorDiv.textContent = "Error al actualizar en Firebase: " + error.message;
+                            console.error("Error al actualizar en Firebase:", error);
+                        }
+                    });
+                });
+            });
+        } catch (error) {
+            errorDiv.textContent = `Error al cargar el historial: ${error.message}`;
+        }
+    };
+
+    loadSearchHistory();
+    </script>
+          <!-- Incluye FontAwesome CDN para los iconos -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>
