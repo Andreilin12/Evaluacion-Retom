@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colaboradores</title>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBkCVuK8ovujWGJI5OTeOSqmednaXhnHsA",
+            authDomain: "motomovie-peliculas.firebaseapp.com",
+            projectId: "motomovie-peliculas",
+            storageBucket: "motomovie-peliculas.appspot.com",
+            messagingSenderId: "1027127345040",
+            appId: "1:1027127345040:web:0e8c8a86de87ab443cbd15",
+            measurementId: "G-WY4EYNR19P"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const loadCollaborators = async () => {
+            try {
+                const querySnapshot = await getDocs(collection(db, "collaborators"));
+                const tableContainer = document.getElementById("collaboratorTableContainer");
+                const departments = {};
+
+                querySnapshot.forEach(doc => {
+                    const data = doc.data();
+                    const department = data.department || "Sin Departamento";
+
+                    if (!departments[department]) {
+                        departments[department] = [];
+                    }
+
+                    departments[department].push({ id: doc.id, data });
+                });
+
+                tableContainer.innerHTML = "";
+
+                Object.keys(departments).forEach(department => {
+                    const section = document.createElement("section");
+                    const title = document.createElement("h2");
+                    title.textContent = department;
+
+                    const table = document.createElement("table");
+                    table.innerHTML = `
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Departamento</th>
+                                <th>Área de Trabajo</th>
+                                <th>Posición</th>
+                                <th>ID</th>
+                                <th>Jefe a Cargo</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    `;
+
+                    const tableBody = table.querySelector("tbody");
+
+                    departments[department].forEach(({ id, data }) => {
+                        const row = document.createElement("tr");
+
+                        row.innerHTML = `
+                            <td contenteditable="true" data-field="name">${data.name || ""}</td>
+                            <td contenteditable="true" data-field="department">${data.department || ""}</td>
+                            <td contenteditable="true" data-field="workArea">${data.workArea || ""}</td>
+                            <td contenteditable="true" data-field="position">${data.position || ""}</td>
+                            <td data-field="id">${data.id || ""}</td>
+                            <td contenteditable="true" data-field="manager">${data.manager || ""}</td>
+                            <td>
+                                <button class="saveBtn" data-id="${id}">Guardar</button>
+                            </td>
+                        `;
+
+                        tableBody.appendChild(row);
+                    });
+
+                    section.appendChild(title);
+                    section.appendChild(table);
+                    tableContainer.appendChild(section);
+                });
+
+                attachSaveHandlers();
+            } catch (error) {
+                console.error("Error al cargar colaboradores:", error);
+            }
+        };
+
+        const attachSaveHandlers = () => {
+            const saveButtons = document.querySelectorAll(".saveBtn");
+            saveButtons.forEach(button => {
+                button.addEventListener("click", async () => {
+                    const row = button.closest("tr");
+                    const docId = button.dataset.id;
+
+                    const updatedData = {};
+                    row.querySelectorAll("td[contenteditable='true']").forEach(cell => {
+                        const field = cell.dataset.field;
+                        updatedData[field] = cell.textContent.trim();
+                    });
+
+                    try {
+                        const docRef = doc(db, "collaborators", docId);
+                        await updateDoc(docRef, updatedData);
+                        alert("Datos actualizados correctamente.");
+                    } catch (error) {
+                        console.error("Error al guardar los cambios:", error);
+                    }
+                });
+            });
+        };
+
+        const filterCollaborators = () => {
+            const nameFilter = document.getElementById("nameSearch").value.toLowerCase();
+            const idFilter = document.getElementById("idSearch").value.toLowerCase();
+            const sections = document.querySelectorAll("section");
+
+            sections.forEach(section => {
+                const rows = section.querySelectorAll("tbody tr");
+                let hasVisibleRows = false;
+
+                rows.forEach(row => {
+                    const name = row.querySelector("td[data-field='name']").textContent.toLowerCase();
+                    const id = row.querySelector("td[data-field='id']").textContent.toLowerCase();
+
+                    if ((name.includes(nameFilter) || !nameFilter) && (id.includes(idFilter) || !idFilter)) {
+                        row.style.display = "";
+                        hasVisibleRows = true;
+                    } else {
+                        row.style.display = "none";
+                    }
+                });
+
+                section.style.display = hasVisibleRows ? "" : "none";
+            });
+        };
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadCollaborators();
+
+            document.getElementById("nameSearch").addEventListener("input", filterCollaborators);
+            document.getElementById("idSearch").addEventListener("input", filterCollaborators);
+        });
+    </script>
+    <style>
+    /* Estilo general para la página */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #2c3e50, #2c3e50);
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* Encabezado principal */
+h1 {
+    font-size: 2.5rem;
+    color: #fff;
+    text-shadow: 0 0 10px #, 0 0 20px #;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Contenedor para los buscadores */
+.search-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+/* Estilo para los inputs de búsqueda */
+.search-container input {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px 15px;
+    border: 2px solid transparent;
+    border-radius: 25px;
+    background: rgba(255, 255, 255);
+    color: #e0e0e0;
+    outline: none;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 5px rgba(255, 255, 255);
+}
+
+.search-container input:focus {
+    border-color: #15a086;
+    box-shadow: 0 0 15px rgba(255, 255, 255);
+    background: rgba(255, 255, 255);
+}
+
+/* Contenedor de los buscadores */
+#searchContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid #fff;
+    border-radius: 15px;
+    box-shadow: 0 0 15px rgba(255, 255, 255);
+}
+
+/* Estilos para los inputs de búsqueda */
+#searchContainer input {
+    width: 100%;
+    max-width: 300px;
+    padding: 12px 20px;
+    border: 2px solid transparent;
+    border-radius: 25px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #e0e0e0;
+    outline: none;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 5px rgba(21, 160, 135);
+}
+
+/* Efecto al enfocar el input */
+#searchContainer input:focus {
+    border-color: #16e086;
+    box-shadow: 0 0 15px rgba(21, 160, 135);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Adaptabilidad para pantallas más pequeñas */
+@media (max-width: 768px) {
+    #searchContainer input {
+        max-width: 100%;
+    }
+}
+
+
+/* Contenedor para tablas */
+#collaboratorTableContainer section {
+    margin-bottom: 30px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid #fff;
+    border-radius: 15px;
+    box-shadow: 0 0 10px rgba(255, 255, 255);
+}
+
+/* Estilo de los títulos de sección */
+h2 {
+    font-size: 1.8rem;
+    color: #fff;
+    text-shadow: 0 0 10px #;
+    margin-bottom: 15px;
+}
+
+/* Estilo de las tablas */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 1rem;
+    background: rgba(0, 0, 0, 0.6);
+    color: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #fff;
+}
+
+th {
+    background: linear-gradient(135deg, #15a086, #16e086);
+    color: white;
+    text-transform: uppercase;
+}
+
+td[contenteditable="true"] {
+    background: rgba(0, 0, 0,6);
+    border: 1px dashed #007bbf;
+}
+
+/* Botones de acción */
+button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 25px;
+    background: linear-gradient(135deg, #15a086, #16e086);
+    color: white;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+button:hover {
+    background: linear-gradient(135deg, #16e086, #15a086); 
+    box-shadow: 0 0 10px rgba(0, 198, 255, 0.8);
+}
+ 
+/* Estilo para alertas */
+ .alert {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 25px;
+    background: linear-gradient(135deg, #007bbf, #00c6ff);
+    color: white;
+    font-size: 1rem;
+    box-shadow: 0 0 15px rgba(0, 198, 255, 0.8);
+    display: none; /* Mostrar al activarse */
+    z-index: 1000;
+}
+
+.alert.success {
+    background: linear-gradient(135deg, #4CAF50, #2E8B57);
+    box-shadow: 0 0 15px rgba(76, 175, 80, 0.8);
+}
+
+.alert.error {
+    background: linear-gradient(135deg, #FF5722, #E64A19);
+    box-shadow: 0 0 15px rgba(255, 87, 34, 0.8);
+}
+
+.alert.show {
+    display: block;
+    animation: fadeInOut 3s ease-in-out;
+}
+
+/* Animación para alertas */
+@keyframes fadeInOut {
+    0%, 80% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}
+
+/* Adaptabilidad */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2rem;
+    }
+
+    .search-container input {
+        max-width: 100%;
+    }
+
+    table {
+        font-size: 0.9rem;
+    }
+
+    th, td {
+        padding: 8px;
+    }
+}
+
+</style>
+
+</head>
+<body>
+    <h1>Lista de Colaboradores</h1>
+    <div id="searchContainer">
+        <input type="text" id="nameSearch" placeholder="Buscar por Nombre...">
+        <input type="text" id="idSearch" placeholder="Buscar por ID...">
+    </div>
+    <div id="collaboratorTableContainer"></div>
+</body>
+</html>
