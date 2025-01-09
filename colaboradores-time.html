@@ -3,151 +3,159 @@
 <head> 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de colaboradores</title>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+    <title>Colaboradores</title>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBkCVuK8ovujWGJI5OTeOSqmednaXhnHsA",
-            authDomain: "motomovie-peliculas.firebaseapp.com",
-            projectId: "motomovie-peliculas",
-            storageBucket: "motomovie-peliculas.appspot.com",
-            messagingSenderId: "1027127345040",
-            appId: "1:1027127345040:web:0e8c8a86de87ab443cbd15",
-            measurementId: "G-WY4EYNR19P"
-        };
+    const firebaseConfig = {
+        apiKey: "AIzaSyBkCVuK8ovujWGJI5OTeOSqmednaXhnHsA",
+        authDomain: "motomovie-peliculas.firebaseapp.com",
+        projectId: "motomovie-peliculas",
+        storageBucket: "motomovie-peliculas.appspot.com",
+        messagingSenderId: "1027127345040",
+        appId: "1:1027127345040:web:0e8c8a86de87ab443cbd15",
+        measurementId: "G-WY4EYNR19P"
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-        const loadCollaborators = async () => {
-            try {
-                const querySnapshot = await getDocs(collection(db, "collaborators"));
-                const tableContainer = document.getElementById("collaboratorTableContainer");
-                const departments = {};
+    const loadCollaborators = async () => {
+        try {
+            const querySnapshot = await getDocs(collection(db, "collaborators"));
+            const tableContainer = document.getElementById("collaboratorTableContainer");
+            const collaboratorCounter = document.getElementById("collaboratorCounter");
+            const departments = {};
+            let totalCollaborators = 0;
 
-                querySnapshot.forEach(doc => {
-                    const data = doc.data();
-                    const department = data.department || "Sin Departamento";
+            querySnapshot.forEach(doc => {
+                const data = doc.data();
+                const department = data.department || "Sin Departamento";
+                totalCollaborators++;
 
-                    if (!departments[department]) {
-                        departments[department] = [];
-                    }
+                if (!departments[department]) {
+                    departments[department] = [];
+                }
 
-                    departments[department].push({ id: doc.id, data });
-                });
+                departments[department].push({ id: doc.id, data });
+            });
 
-                tableContainer.innerHTML = "";
+            // Actualizar el contador de colaboradores
+            collaboratorCounter.textContent = `Total de Colaboradores: ${totalCollaborators}`;
 
-                Object.keys(departments).forEach(department => {
-                    const section = document.createElement("section");
-                    const title = document.createElement("h2");
-                    title.textContent = department;
+            tableContainer.innerHTML = "";
 
-                    const table = document.createElement("table");
-                    table.innerHTML = `
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Departamento</th>
-                                <th>Área de Trabajo</th>
-                                <th>Posición</th>
-                                <th>ID</th>
-                                <th>Jefe a Cargo</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
+            Object.keys(departments).forEach(department => {
+                const section = document.createElement("section");
+                const title = document.createElement("h2");
+                title.textContent = department;
+
+                const table = document.createElement("table");
+                table.innerHTML = `
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Departamento</th>
+                            <th>Área de Trabajo</th>
+                            <th>Posición</th>
+                            <th>ID</th>
+                            <th>Jefe a Cargo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                `;
+
+                const tableBody = table.querySelector("tbody");
+
+                departments[department].forEach(({ id, data }) => {
+                    const row = document.createElement("tr");
+
+                    row.innerHTML = `
+                        <td contenteditable="true" data-field="name">${data.name || ""}</td>
+                        <td contenteditable="true" data-field="department">${data.department || ""}</td>
+                        <td contenteditable="true" data-field="workArea">${data.workArea || ""}</td>
+                        <td contenteditable="true" data-field="position">${data.position || ""}</td>
+                        <td data-field="id">${data.id || ""}</td>
+                        <td contenteditable="true" data-field="manager">${data.supervisor || ""}</td>
+                        <td>
+                            <button class="saveBtn" data-id="${id}">Guardar</button>
+                        </td>
                     `;
 
-                    const tableBody = table.querySelector("tbody");
-
-                    departments[department].forEach(({ id, data }) => {
-                        const row = document.createElement("tr");
-
-                        row.innerHTML = `
-                            <td contenteditable="true" data-field="name">${data.name || ""}</td>
-                            <td contenteditable="true" data-field="department">${data.department || ""}</td>
-                            <td contenteditable="true" data-field="workArea">${data.workArea || ""}</td>
-                            <td contenteditable="true" data-field="position">${data.position || ""}</td>
-                            <td data-field="id">${data.id || ""}</td>
-                            <td contenteditable="true" data-field="manager">${data.manager || ""}</td>
-                            <td>
-                                <button class="saveBtn" data-id="${id}">Guardar</button>
-                            </td>
-                        `;
-
-                        tableBody.appendChild(row);
-                    });
-
-                    section.appendChild(title);
-                    section.appendChild(table);
-                    tableContainer.appendChild(section);
+                    tableBody.appendChild(row);
                 });
 
-                attachSaveHandlers();
-            } catch (error) {
-                console.error("Error al cargar colaboradores:", error);
-            }
-        };
-
-        const attachSaveHandlers = () => {
-            const saveButtons = document.querySelectorAll(".saveBtn");
-            saveButtons.forEach(button => {
-                button.addEventListener("click", async () => {
-                    const row = button.closest("tr");
-                    const docId = button.dataset.id;
-
-                    const updatedData = {};
-                    row.querySelectorAll("td[contenteditable='true']").forEach(cell => {
-                        const field = cell.dataset.field;
-                        updatedData[field] = cell.textContent.trim();
-                    });
-
-                    try {
-                        const docRef = doc(db, "collaborators", docId);
-                        await updateDoc(docRef, updatedData);
-                        alert("Datos actualizados correctamente.");
-                    } catch (error) {
-                        console.error("Error al guardar los cambios:", error);
-                    }
-                });
+                section.appendChild(title);
+                section.appendChild(table);
+                tableContainer.appendChild(section);
             });
-        };
 
-        const filterCollaborators = () => {
-            const nameFilter = document.getElementById("nameSearch").value.toLowerCase();
-            const idFilter = document.getElementById("idSearch").value.toLowerCase();
-            const sections = document.querySelectorAll("section");
+            attachSaveHandlers();
+        } catch (error) {
+            console.error("Error al cargar colaboradores:", error);
+        }
+    };
 
-            sections.forEach(section => {
-                const rows = section.querySelectorAll("tbody tr");
-                let hasVisibleRows = false;
+    const attachSaveHandlers = () => {
+        const saveButtons = document.querySelectorAll(".saveBtn");
+        saveButtons.forEach(button => {
+            button.addEventListener("click", async () => {
+                const row = button.closest("tr");
+                const docId = button.dataset.id;
 
-                rows.forEach(row => {
-                    const name = row.querySelector("td[data-field='name']").textContent.toLowerCase();
-                    const id = row.querySelector("td[data-field='id']").textContent.toLowerCase();
-
-                    if ((name.includes(nameFilter) || !nameFilter) && (id.includes(idFilter) || !idFilter)) {
-                        row.style.display = "";
-                        hasVisibleRows = true;
-                    } else {
-                        row.style.display = "none";
-                    }
+                const updatedData = {};
+                row.querySelectorAll("td[contenteditable='true']").forEach(cell => {
+                    const field = cell.dataset.field;
+                    updatedData[field] = cell.textContent.trim();
                 });
 
-                section.style.display = hasVisibleRows ? "" : "none";
+                try {
+                    const docRef = doc(db, "collaborators", docId);
+                    await updateDoc(docRef, updatedData);
+                    alert("Datos actualizados correctamente.");
+                } catch (error) {
+                    console.error("Error al guardar los cambios:", error);
+                }
             });
-        };
-
-        document.addEventListener("DOMContentLoaded", () => {
-            loadCollaborators();
-
-            document.getElementById("nameSearch").addEventListener("input", filterCollaborators);
-            document.getElementById("idSearch").addEventListener("input", filterCollaborators);
         });
-    </script>
+    };
+
+    const filterCollaborators = () => {
+        const nameFilter = document.getElementById("nameSearch").value.toLowerCase();
+        const idFilter = document.getElementById("idSearch").value.toLowerCase();
+        const sections = document.querySelectorAll("section");
+
+        sections.forEach(section => {
+            const rows = section.querySelectorAll("tbody tr");
+            let hasVisibleRows = false;
+
+            rows.forEach(row => {
+                const name = row.querySelector("td[data-field='name']").textContent.toLowerCase();
+                const id = row.querySelector("td[data-field='id']").textContent.toLowerCase();
+
+                if ((name.includes(nameFilter) || !nameFilter) && (id.includes(idFilter) || !idFilter)) {
+                    row.style.display = "";
+                    hasVisibleRows = true;
+                } else {
+                    row.style.display = "none";
+                }
+            });
+
+            section.style.display = hasVisibleRows ? "" : "none";
+        });
+    };
+
+    document.addEventListener("DOMContentLoaded", () => {
+        loadCollaborators(); 
+
+        document.getElementById("nameSearch").addEventListener("input", filterCollaborators);
+        document.getElementById("idSearch").addEventListener("input", filterCollaborators);
+    });
+</script>
+
+
     <style>
     /* Estilo general para la página */
 body {
@@ -374,11 +382,15 @@ button:hover {
 
 </head>
 <body>
-    <h1>Gestión de colaboradores</h1>
+    <h1>Lista de Colaboradores</h1>
     <div id="searchContainer">
         <input type="text" id="nameSearch" placeholder="Buscar por Nombre...">
         <input type="text" id="idSearch" placeholder="Buscar por ID...">
     </div>
+
+ <div id="collaboratorCounter" style="text-align: center; font-size: 1.5rem; margin-bottom: 20px;">
+    Total de Colaboradores: 0
+</div>
     <div id="collaboratorTableContainer"></div>
 </body>
 </html>
