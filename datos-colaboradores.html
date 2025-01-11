@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Colaboradores</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 20px;
+            background-color: #2c3e50;
+            color: #e0e0e0;
+        }
+
+        h1 {
+            position: relative;
+            text-align: center;
+            background: linear-gradient(90deg, #15a086, #16e086);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            font-size: 2em;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .icon-button {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background-color: #15a086;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .icon-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.7);
+        }
+
+        h2 {
+            color: #fff;
+            font-size: 1.8em;
+            border-left: 6px solid #15a086;
+            padding-left: 15px;
+            margin-bottom: 15px;
+        }
+
+        .department-section {
+            page-break-inside: avoid;
+            margin-bottom: 40px;
+            background: #2b2b2b;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background-color: #2c3e50;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        table th, table td {
+            border: 1px solid #333;
+            padding: 12px;
+            text-align: left;
+            color: #e0e0e0;
+        }
+
+        table th {
+            background-color: #15a086;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #2c3e50;
+        }
+
+        .no-print {
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background: linear-gradient(90deg, #15a086, #16a086);
+            color: white;
+            border: none;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.7);
+        }
+
+       /* Ocultar iconos flotantes y botones al imprimir */
+@media print {
+    .icon-button,
+    .no-print,
+    .floating-icon {
+        display: none !important;
+    }
+
+
+            body {
+                background-color: #2c3e50;
+                margin: 0;
+            }
+
+            h1, h2 {
+                color: #000;
+                background: none;
+                box-shadow: none;
+            }
+
+            table {
+                box-shadow: none;
+        background-color: #2c3e50;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>
+        Datos  de colaboradores
+        <button onclick="window.print()" class="icon-button">
+            <i class="fas fa-print"></i>
+        </button>
+    </h1>
+
+    <div id="departments"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBkCVuK8ovujWGJI5OTeOSqmednaXhnHsA",
+            authDomain: "motomovie-peliculas.firebaseapp.com",
+            projectId: "motomovie-peliculas",
+            storageBucket: "motomovie-peliculas.appspot.com",
+            messagingSenderId: "1027127345040",
+            appId: "1:1027127345040:web:0e8c8a86de87ab443cbd15",
+            measurementId: "G-WY4EYNR19P"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const loadCollaborators = async () => {
+            try {
+                const querySnapshot = await getDocs(collection(db, "collaborators"));
+                const departments = {};
+
+                querySnapshot.forEach(doc => {
+                    const data = doc.data();
+                    const department = data.department || "Sin Departamento";
+
+                    if (!departments[department]) {
+                        departments[department] = [];
+                    }
+
+                    departments[department].push({
+                        id: data.id,
+                        name: data.name || "Sin Nombre",
+                        position: data.position || "Sin Posición",
+                        workArea: data.workArea || "Sin Área de Trabajo",
+                    });
+                });
+
+                displayDepartments(departments);
+            } catch (error) {
+                console.error("Error al cargar colaboradores:", error);
+            }
+        };
+
+        const displayDepartments = (departments) => {
+            const container = document.getElementById("departments");
+            container.innerHTML = "";
+
+            for (const [department, collaborators] of Object.entries(departments)) {
+                const departmentSection = document.createElement("div");
+                departmentSection.classList.add("department-section");
+
+                departmentSection.innerHTML = `
+                    <h2>${department}</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Posición</th>
+                                <th>Área de Trabajo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${collaborators.map(collaborator => `
+                                <tr>
+                                    <td>${collaborator.id}</td>
+                                    <td>${collaborator.name}</td>
+                                    <td>${collaborator.position}</td>
+                                    <td>${collaborator.workArea}</td>
+                                </tr>
+                            `).join("")}
+                        </tbody>
+                    </table>
+                `;
+
+                container.appendChild(departmentSection);
+            }
+        };
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadCollaborators();
+        });
+    </script>
+</body>
+</html>
