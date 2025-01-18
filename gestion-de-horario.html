@@ -38,9 +38,9 @@
     #searchInput:focus {
         border-color: #15a086;
         outline: none;
-        box-shadow: 0 0 8px rgba(21, 160, 134);
+        box-shadow: 0 0 8px rgba(21, 160, 134); 
     } 
-
+ 
     /* Tabla */
     table {
         width: 100%;
@@ -79,13 +79,13 @@
     tr:nth-child(even) {
         background-color: #333b44;
     }
-
+ 
     tr:hover {
         background-color: #fff;
         transform: translateX(5px);
         transition: all 0.3s ease;
-    }
-
+    }  
+ 
     /* Div de acciones */
     div {
         display: flex;
@@ -203,14 +203,13 @@
 <div id="noRecords"></div>
 
 
-
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
     import { 
         getFirestore, 
         collection, 
         getDocs, 
-        query, 
+        query,  
         orderBy, 
         doc, 
         updateDoc 
@@ -234,7 +233,7 @@
     const noRecordsDiv = document.getElementById("noRecords");
     const searchInput = document.getElementById("searchInput");
 
-    let fullData = []; // Almacena todos los datos cargados
+    let fullData = []; // Almacena todos los registros cargados
 
     const renderTable = (data) => {
         historyTable.innerHTML = ""; // Limpia la tabla
@@ -251,34 +250,20 @@
             const cell3 = row.insertCell(2);
             const cell4 = row.insertCell(3);
 
+            // Columna con ID, Nombre y Posición
             cell1.innerHTML = `
                 <div><strong>ID:</strong> ${id}</div>
                 <div><strong>Nombre:</strong> ${collaborator.name}</div>
                 <div><strong>Posición:</strong> ${collaborator.position}</div>
             `;
 
+            // Columna de Entrada (editable)
             const entryTimeInput = document.createElement("input");
             entryTimeInput.type = "time";
-            entryTimeInput.value = salida?.time || "";
+            entryTimeInput.value = entrada?.time || "";
             entryTimeInput.addEventListener("blur", async () => {
                 try {
                     const updatedTimestamp = new Date(`${date}T${entryTimeInput.value}`);
-                    if (salida?.docRef) {
-                        await updateDoc(salida.docRef, { timestamp: updatedTimestamp });
-                        console.log("Hora de salida actualizada correctamente.");
-                    }
-                } catch (error) {
-                    errorDiv.textContent = `Error al actualizar la salida: ${error.message}`;
-                }
-            });
-            cell2.appendChild(entryTimeInput);
-
-            const exitTimeInput = document.createElement("input");
-            exitTimeInput.type = "time";
-            exitTimeInput.value = entrada?.time || "";
-            exitTimeInput.addEventListener("blur", async () => {
-                try {
-                    const updatedTimestamp = new Date(`${date}T${exitTimeInput.value}`);
                     if (entrada?.docRef) {
                         await updateDoc(entrada.docRef, { timestamp: updatedTimestamp });
                         console.log("Hora de entrada actualizada correctamente.");
@@ -287,8 +272,26 @@
                     errorDiv.textContent = `Error al actualizar la entrada: ${error.message}`;
                 }
             });
+            cell2.appendChild(entryTimeInput);
+
+            // Columna de Salida (editable)
+            const exitTimeInput = document.createElement("input");
+            exitTimeInput.type = "time";
+            exitTimeInput.value = salida?.time || "";
+            exitTimeInput.addEventListener("blur", async () => {
+                try {
+                    const updatedTimestamp = new Date(`${date}T${exitTimeInput.value}`);
+                    if (salida?.docRef) {
+                        await updateDoc(salida.docRef, { timestamp: updatedTimestamp });
+                        console.log("Hora de salida actualizada correctamente.");
+                    }
+                } catch (error) {
+                    errorDiv.textContent = `Error al actualizar la salida: ${error.message}`;
+                }
+            });
             cell3.appendChild(exitTimeInput);
 
+            // Fecha (No editable)
             cell4.textContent = date;
         });
     };
@@ -343,7 +346,7 @@
                     } else if (data.action === "salida") {
                         record.salida = {
                             time: timestamp.toTimeString().slice(0, 5),
-                            docRef: doc(db, "searchHistory", docSnapshot.id) 
+                            docRef: doc(db, "searchHistory", docSnapshot.id)
                         };
                     }
                 }
@@ -354,8 +357,9 @@
             errorDiv.textContent = `Error al cargar el historial: ${error.message}`;
         }
     };
-
-    searchInput.addEventListener("input", () => {
+ 
+    // Función de búsqueda en tiempo real
+    searchInput.addEventListener("input", () => { 
         const searchValue = searchInput.value.toLowerCase();
         if (searchValue.trim() === "") {
             renderTable(fullData);
@@ -369,12 +373,24 @@
     });
 
     loadSearchHistory();
-    </script>
+</script>
 
-       <script>
+ 
+
+
+
+
+
+
+       <script> 
         function goBack() {
             window.history.back(); 
         }
-    </script>
-     </body>
+    </script> 
+     </body> 
     </html>    
+ 
+
+ 
+
+
