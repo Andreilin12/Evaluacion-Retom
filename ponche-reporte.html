@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Colaboradores</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #2c3e50;
+        }
+        h1 {
+            color: #fff; /* Color blanco */
+            text-align: center; /* Centrar texto */
+            margin-bottom: 20px; /* Espaciado inferior */
+        }
+        .collaborator-folder {
+            cursor: pointer;
+            margin-bottom: 10px;
+            background-color: #15a086;
+            padding: 10px;
+            color: white;
+            border-radius: 5px;
+        }
+        .collaborator-details {
+            display: none;
+            background-color: #f1f1f1;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+        }
+        .collaborator-report, .total-report {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #e2e2e2;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
+        #searchInput {
+            margin-bottom: 20px;
+            padding: 8px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        #collaboratorModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+        #modalDetails {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 900px;
+        }
+        button {
+            padding: 8px 15px;
+            background-color: #15a086;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #16e086;
+        }
+        .total-report {
+            margin-top: 20px;
+            background-color: #f0f8ff;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+     
+  /* Desactivar la selección de texto y el efecto de arrastre en todos los elementos */
+ * {
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE 10+ */
+  user-select: none; /* estándar */
+
+  -webkit-user-drag: none; /* Safari */
+  -khtml-user-drag: none; /* Konqueror HTML */
+  -moz-user-drag: none; /* Firefox */
+  -o-user-drag: none; /* Opera */
+  user-drag: none; /* estándar */
+   }
+
+.back-button {
+    position: fixed;
+    top: 10px; /* Distancia desde la parte superior */
+    left: 10px; /* Distancia desde el borde izquierdo */
+    background-color: #16a085; /* Color de fondo */
+    color: #fff; /* Color del texto y del icono */
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.3s; /* Transición suave para el color de fondo */
+    z-index: 1000; /* Asegura que el botón esté sobre otros elementos */
+}
+
+.back-button i {
+    margin-right: 8px; /* Espacio entre el icono y el texto */
+}
+
+.back-button:hover {
+    background-color: #2c2e50; /* Color de fondo al pasar el ratón */
+}
+
+     
+
+    </style>
+
+</head>
+<body>
+
+     <button class="back-button" onclick="goBack()">
+        <i class="fas fa-arrow-left"></i> Volver
+    </button>  
+
+<h1>Gestión de reporte</h1>
+
+<input type="text" id="searchInput" placeholder="Buscar por colaborador..." />
+
+<div id="collaboratorList"></div>
+
+<div id="error" style="color: red;"></div>
+
+<!-- Modal -->
+<div id="collaboratorModal">
+    <div id="modalDetails"></div>
+    <button id="closeModal">Cerrar</button>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, where, orderBy, updateDoc, doc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBkCVuK8ovujWGJI5OTeOSqmednaXhnHsA",
+        authDomain: "motomovie-peliculas.firebaseapp.com",
+        projectId: "motomovie-peliculas",
+        storageBucket: "motomovie-peliculas.appspot.com",
+        messagingSenderId: "1027127345040",
+        appId: "1:1027127345040:web:0e8c8a86de87ab443cbd15",
+        measurementId: "G-WY4EYNR19P"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const collaboratorList = document.getElementById("collaboratorList");
+    const modal = document.getElementById("collaboratorModal");
+    const modalDetails = document.getElementById("modalDetails");
+    const closeModalBtn = document.getElementById("closeModal");
+    const searchInput = document.getElementById("searchInput");
+    const printButton = document.getElementById("printButton");  // Botón para imprimir
+
+    // Cargar historial de búsqueda
+    const loadSearchHistory = async () => {
+        try {
+            const q = query(collection(db, "searchHistory"), orderBy("timestamp", "asc"));
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                collaboratorList.innerHTML = "No hay registros en el historial.";
+                return;
+            }
+
+            const collaborators = {};
+
+            for (const doc of querySnapshot.docs) {
+                const data = doc.data();
+                const searchId = data.id;
+                const timestamp = data.timestamp?.toDate();
+
+                if (!timestamp) continue;
+
+                const collaboratorQuery = query(collection(db, "collaborators"), where("id", "==", searchId));
+                const collaboratorSnapshot = await getDocs(collaboratorQuery);
+
+                if (!collaboratorSnapshot.empty) {
+                    const collaboratorData = collaboratorSnapshot.docs[0].data();
+                    const name = collaboratorData.name || "Sin nombre";
+                    const position = collaboratorData.position || "Sin posición";
+                    const department = collaboratorData.department || "Sin departamento";
+                    let assignedHours = collaboratorData.assignedHours || 8;
+
+                    if (!collaborators[name]) {
+                        collaborators[name] = { assignedHours, records: {}, docId: collaboratorSnapshot.docs[0].id, rate: collaboratorData.rate || 0, id: collaboratorData.id, position, department };
+                    }
+
+                    const dateKey = timestamp.toLocaleDateString();
+                    if (!collaborators[name].records[dateKey]) {
+                        collaborators[name].records[dateKey] = { entry: null, exit: null };
+                    }
+
+                    if (!collaborators[name].records[dateKey].entry) {
+                        collaborators[name].records[dateKey].entry = timestamp;
+                    } else {
+                        collaborators[name].records[dateKey].exit = timestamp;
+                    }
+                }
+            }
+
+            renderCollaboratorList(collaborators);
+        } catch (error) {
+            console.error("Error al cargar el historial:", error);
+        }
+    };
+
+    const formatTimeDifference = (start, end) => {
+        const diffInMillis = end - start;
+
+        if (diffInMillis < 0) return "Invalid time range"; // Si la diferencia es negativa, se indica un error
+
+        const seconds = Math.floor(diffInMillis / 1000);
+        const minutes = Math.floor(seconds / 60);
+        const hours = Math.floor(minutes / 60);
+
+        const extraMinutes = minutes % 60;
+        const extraSeconds = seconds % 60;
+
+        if (hours > 0) {
+            return `${hours} Horas ${extraMinutes} Minutos ${extraSeconds} Segundos`;
+        } else if (minutes > 0) {
+            return `${extraMinutes} Minutos ${extraSeconds} Segundos`;
+        } else {
+            return `${extraSeconds} Segundos`;
+        }
+    };
+
+    const formatCurrency = (value) => {
+        return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    };
+
+    const renderCollaboratorList = (collaborators) => {
+        collaboratorList.innerHTML = "";
+        Object.entries(collaborators).forEach(([name, data]) => {
+            const folder = document.createElement("div");
+            folder.className = "collaborator-folder";
+            folder.textContent = name;
+            folder.onclick = () => showDetails(name, data);
+
+            collaboratorList.appendChild(folder);
+        });
+    };
+
+    const showDetails = (name, data) => {
+        modal.style.display = "flex";
+
+        const rows = Object.entries(data.records).map(([date, record]) => {
+            const entryTime = record.entry ? record.entry.toLocaleTimeString() : "Sin entrada";
+            const exitTime = record.exit ? record.exit.toLocaleTimeString() : "?";
+
+            const workedTime = record.entry && record.exit ? formatTimeDifference(record.entry, record.exit) : "0 hora";
+            const workedHours = record.entry && record.exit
+                ? (record.exit - record.entry) / (1000 * 60 * 60)
+                : 0;
+            const extraHours = Math.max(0, workedHours - data.assignedHours);
+            const status = !record.entry || !record.exit ? "Turno Incompleto" : "Completado";
+
+            return `
+                <tr>
+                    <td>${date}</td>
+                    <td>${entryTime}</td>
+                    <td>${exitTime}</td>
+                    <td>${workedTime}</td>
+                    <td>${extraHours.toFixed(2)}</td>
+                    <td>${status}</td>
+                </tr>
+            `;
+        });
+
+        // Cálculo total de horas trabajadas
+        const totalWorkedHours = Object.values(data.records).reduce((sum, record) => {
+            const workedTime = record.entry && record.exit ? (record.exit - record.entry) / (1000 * 60 * 60) : 0;
+            return sum + workedTime;
+        }, 0);
+
+        // Cálculo total de horas extras
+        const totalExtraHours = Object.values(data.records).reduce((sum, record) => {
+            const workedHours = record.entry && record.exit
+                ? (record.exit - record.entry) / (1000 * 60 * 60)
+                : 0;
+            const extraHours = Math.max(0, workedHours - data.assignedHours);
+            return sum + extraHours;
+        }, 0);
+
+        // Cálculo de tarifa por horas extras
+        const extraRate = data.rate || 0;
+        const totalExtraCost = extraRate * totalExtraHours;
+
+        modalDetails.innerHTML = `
+            <button id="printButton">Imprimir Detalles</button>
+            <h3>Detalles de ${name}</h3>
+            <p><strong>ID:</strong> ${data.id}</p>
+            <p><strong>Posición:</strong> ${data.position}</p>
+            <p><strong>Departamento:</strong> ${data.department}</p>
+            <p>Horas asignadas: <input type="number" id="assignedHoursInput" value="${data.assignedHours}" min="0"></p>
+            <p>Tarifa por hora extra: <input type="number" id="rateInput" value="${data.rate}" min="0"></p>
+            <button id="saveAssignedHoursBtn">Guardar horas asignadas</button>
+            <p>Total de horas trabajadas: ${totalWorkedHours.toFixed(2)} horas</p>
+            <p>Total de horas extras: ${totalExtraHours.toFixed(2)} horas</p>
+            <p>Costo total de horas extras: ${formatCurrency(totalExtraCost)}</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Entrada</th>
+                        <th>Salida</th>
+                        <th>Horas trabajadas</th>
+                        <th>Horas extras</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>${rows.join("")}</tbody>
+            </table>
+            
+        `;
+
+        // Función para imprimir
+        const printButton = document.getElementById("printButton");
+        printButton.onclick = () => {
+            const printContent = modalDetails.innerHTML;
+            const printWindow = window.open("", "_blank");
+            printWindow.document.write("<html><head><title>Impresión de Detalles</title><style>");
+            printWindow.document.write("body {font-family: Arial, sans-serif;} button {display: none;} table {width: 100%; border-collapse: collapse;} th, td {border: 1px solid black; padding: 8px;} th {background-color: #f2f2f2;} </style></head><body>");
+            printWindow.document.write(printContent);
+            printWindow.document.write("</body></html>");
+            printWindow.document.close();
+            printWindow.print();
+        };
+
+        const saveAssignedHoursBtn = document.getElementById("saveAssignedHoursBtn");
+        saveAssignedHoursBtn.onclick = async () => {
+            const newAssignedHours = parseInt(document.getElementById("assignedHoursInput").value, 10);
+            const newRate = parseInt(document.getElementById("rateInput").value, 10);
+
+            if (isNaN(newAssignedHours) || newAssignedHours <= 0) {
+                alert("Por favor ingresa un valor válido para las horas asignadas.");
+                return;
+            }
+
+            try {
+                const collaboratorRef = doc(db, "collaborators", data.docId);
+                await updateDoc(collaboratorRef, {
+                    assignedHours: newAssignedHours,
+                    rate: newRate
+                });
+                alert("Horas asignadas y tarifa por hora extra actualizadas correctamente.");
+            } catch (error) {
+                console.error("Error al actualizar las horas asignadas y tarifa:", error);
+            }
+        };
+    };
+
+    closeModalBtn.onclick = () => {
+        modal.style.display = "none";
+    };
+
+    searchInput.addEventListener("input", () => {
+        const query = searchInput.value.toLowerCase();
+        const folders = document.querySelectorAll(".collaborator-folder");
+        folders.forEach(folder => {
+            folder.style.display = folder.textContent.toLowerCase().includes(query) ? "block" : "none";
+        });
+    });
+
+    loadSearchHistory();
+</script>
+
+   <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+
+</body>
+</html>
