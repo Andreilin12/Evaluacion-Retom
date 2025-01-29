@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Asistencia y Horarios</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+  /* Estilo general */
+    body {
+        font-family: 'Roboto', sans-serif;
+        background-color: #2c3e50;
+        margin: 20px;
+        color: #f0f4f8;
+        line-height: 1.6;
+    }
+
+    /* Estilo de los contenedores principales */
+    #historyTable, #error, #noRecords {
+        margin: 20px 0;
+        padding: 15px;
+        border-radius: 10px;
+    }
+
+    /* Estilo del buscador (removido, pero se deja por si lo necesitas en el futuro) */
+    #searchInput {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #3c4a5b;
+        border-radius: 8px;
+        font-size: 16px;
+        background-color: #21252d;
+        color: #d1d5db;
+        transition: all 0.3s ease-in-out;
+    }
+
+    #searchInput:focus {
+        border-color: #15a086;
+        outline: none;
+        box-shadow: 0 0 8px rgba(21, 160, 134); 
+    } 
+ 
+    /* Tabla */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: #2c3138;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease-in-out;
+    }
+
+    table:hover {
+        transform: scale(1.02);
+    }
+
+    th, td {
+        text-align: left;
+        padding: 12px;
+        border-bottom: 1px solid #fff;
+    }
+
+    th {
+        background-color: #15a086;
+        color: #ffffff;
+        font-size: 18px;
+        font-weight: bold;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        border-bottom: 3px solid #1e2226;
+    }
+
+    td {
+        background-color: #222c36;
+    }
+
+    tr:nth-child(even) {
+        background-color: #333b44;
+    }
+ 
+    tr:hover {
+        background-color: #fff;
+        transform: translateX(5px);
+        transition: all 0.3s ease;
+    }  
+ 
+    /* Div de acciones */
+    div {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    /* Input de tiempo */
+    input[type="time"] {
+        border: 1px solid #3c4a5b;
+        border-radius: 8px;
+        padding: 8px;
+        font-size: 16px;
+        background-color: #21252d;
+        color: #d1d5db;
+        transition: all 0.3s ease;
+    }
+
+    input[type="time"]:focus {
+        border-color: #15a086;
+        outline: none;
+        box-shadow: 0 0 8px rgba(21, 160, 135);
+    }
+
+    /* Mensajes de error y sin registros */
+    #error {
+        color: #ff5f5f;
+        margin-top: 10px;
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    #noRecords {
+        text-align: center;
+        font-size: 18px;
+        margin-top: 20px;
+        color: #6c757d;
+    }
+
+   h1 {
+    text-align: center;
+    font-size: 2.5rem;
+    color: #fff;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+          
+      /* Desactivar la selección de texto y el efecto de arrastre en todos los elementos */
+* {
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE 10+ */
+  user-select: none; /* estándar */
+
+  -webkit-user-drag: none; /* Safari */
+  -khtml-user-drag: none; /* Konqueror HTML */
+  -moz-user-drag: none; /* Firefox */
+  -o-user-drag: none; /* Opera */
+  user-drag: none; /* estándar */
+ }
+
+        .back-button {
+    position: fixed;
+    top: 10px; /* Distancia desde la parte superior */
+    left: 10px; /* Distancia desde el borde izquierdo */
+    background-color: #16a085; /* Color de fondo */
+    color: #fff; /* Color del texto y del icono */
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.3s; /* Transición suave para el color de fondo */
+    z-index: 1000; /* Asegura que el botón esté sobre otros elementos */
+}
+
+.back-button i {
+    margin-right: 8px; /* Espacio entre el icono y el texto */
+}
+
+.back-button:hover {
+    background-color: #2c2e50; /* Color de fondo al pasar el ratón */
+}
+
+    </style>
+</head>
+<body> 
+
+              <button class="back-button" onclick="goBack()">
+        <i class="fas fa-arrow-left"></i> Volver
+    </button> 
+
+   
+    <h1>Gestión de Asistencia y Horarios</h1>  
+   
+<!-- HTML -->
+<input type="text" id="searchInput" placeholder="Buscar por ID o Nombre">
+<table id="historyTable">
+    <thead>
+        <tr>
+            <th>Colaborador</th>
+            <th>Entrada</th>
+            <th>Salida</th>
+            <th>Fecha</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+<div id="error"></div>
+<div id="noRecords"></div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { 
+        getFirestore, 
+        collection, 
+        getDocs, 
+        query,  
+        orderBy, 
+        doc, 
+        updateDoc 
+    } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBkCVuK8ovujWGJI5OTeOSqmednaXhnHsA",
+        authDomain: "motomovie-peliculas.firebaseapp.com",
+        projectId: "motomovie-peliculas",
+        storageBucket: "motomovie-peliculas.appspot.com",
+        messagingSenderId: "1027127345040",
+        appId: "1:1027127345040:web:0e8c8a86de87ab443cbd15",
+        measurementId: "G-WY4EYNR19P"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const historyTable = document.getElementById("historyTable").getElementsByTagName('tbody')[0];
+    const errorDiv = document.getElementById("error");
+    const noRecordsDiv = document.getElementById("noRecords");
+    const searchInput = document.getElementById("searchInput");
+
+    let fullData = []; // Almacena todos los registros cargados
+
+    const renderTable = (data) => {
+        historyTable.innerHTML = ""; // Limpia la tabla
+        
+        if (data.length === 0) {
+            noRecordsDiv.textContent = "No hay registros disponibles.";
+            return;
+        }
+
+        data.forEach(({ id, collaborator, date, entrada, salida }) => {
+            const row = historyTable.insertRow();
+            const cell1 = row.insertCell(0);
+            const cell2 = row.insertCell(1);
+            const cell3 = row.insertCell(2);
+            const cell4 = row.insertCell(3);
+
+            // Columna con ID, Nombre y Posición
+            cell1.innerHTML = `
+                <div><strong>ID:</strong> ${id}</div>
+                <div><strong>Nombre:</strong> ${collaborator.name}</div>
+                <div><strong>Posición:</strong> ${collaborator.position}</div>
+            `;
+
+            // Columna de Entrada (editable)
+            const entryTimeInput = document.createElement("input");
+            entryTimeInput.type = "time";
+            entryTimeInput.value = entrada?.time || "";
+            entryTimeInput.addEventListener("blur", async () => {
+                try {
+                    // Mantener la fecha original y actualizar solo la hora
+                    const updatedTime = entryTimeInput.value;
+                    if (entrada?.docRef) {
+                        await updateDoc(entrada.docRef, { time: updatedTime });
+                        console.log("Hora de entrada actualizada correctamente.");
+                    }
+                } catch (error) {
+                    errorDiv.textContent = `Error al actualizar la entrada: ${error.message}`;
+                }
+            });
+            cell2.appendChild(entryTimeInput);
+
+            // Columna de Salida (editable)
+            const exitTimeInput = document.createElement("input");
+            exitTimeInput.type = "time";
+            exitTimeInput.value = salida?.time || "";
+            exitTimeInput.addEventListener("blur", async () => {
+                try {
+                    // Mantener la fecha original y actualizar solo la hora
+                    const updatedTime = exitTimeInput.value;
+                    if (salida?.docRef) {
+                        await updateDoc(salida.docRef, { time: updatedTime });
+                        console.log("Hora de salida actualizada correctamente.");
+                    }
+                } catch (error) {
+                    errorDiv.textContent = `Error al actualizar la salida: ${error.message}`;
+                }
+            });
+            cell3.appendChild(exitTimeInput);
+
+            // Fecha (No editable)
+            cell4.textContent = date;
+        });
+    };
+
+    const loadSearchHistory = async () => {
+        try {
+            const historyQuery = query(collection(db, "searchHistory"), orderBy("timestamp", "desc"));
+            const collaboratorsQuery = query(collection(db, "collaborators"));
+
+            const historySnapshot = await getDocs(historyQuery);
+            const collaboratorsSnapshot = await getDocs(collaboratorsQuery);
+
+            if (historySnapshot.empty && collaboratorsSnapshot.empty) {
+                renderTable([]);
+                return;
+            }
+
+            const collaboratorsMap = {};
+            collaboratorsSnapshot.forEach((docSnapshot) => {
+                const data = docSnapshot.data();
+                collaboratorsMap[data.id] = data;
+            });
+
+            fullData = [];
+
+            historySnapshot.forEach((docSnapshot) => {
+                const data = docSnapshot.data();
+                const timestamp = data.timestamp.toDate();
+                const date = timestamp.toISOString().split("T")[0];
+
+                const record = fullData.find((rec) => rec.id === data.id && rec.date === date);
+                if (!record) {
+                    fullData.push({
+                        id: data.id,
+                        collaborator: collaboratorsMap[data.id] || { name: "N/A", position: "N/A" },
+                        date,
+                        entrada: data.action === "entrada" ? {
+                            time: data.time || timestamp.toTimeString().slice(0, 5),
+                            docRef: doc(db, "searchHistory", docSnapshot.id) // Mantener la ubicación original
+                        } : null,
+                        salida: data.action === "salida" ? {
+                            time: data.time || timestamp.toTimeString().slice(0, 5),
+                            docRef: doc(db, "searchHistory", docSnapshot.id) // Mantener la ubicación original
+                        } : null
+                    });
+                } else {
+                    if (data.action === "entrada") {
+                        record.entrada = {
+                            time: data.time || timestamp.toTimeString().slice(0, 5),
+                            docRef: doc(db, "searchHistory", docSnapshot.id) // Mantener la ubicación original
+                        };
+                    } else if (data.action === "salida") {
+                        record.salida = {
+                            time: data.time || timestamp.toTimeString().slice(0, 5),
+                            docRef: doc(db, "searchHistory", docSnapshot.id) // Mantener la ubicación original
+                        };
+                    }
+                }
+            });
+
+            renderTable(fullData);
+        } catch (error) {
+            errorDiv.textContent = `Error al cargar el historial: ${error.message}`;
+        }
+    };
+
+    // Función de búsqueda en tiempo real
+    searchInput.addEventListener("input", () => { 
+        const searchValue = searchInput.value.toLowerCase();
+        if (searchValue.trim() === "") {
+            renderTable(fullData);
+        } else {
+            const filteredData = fullData.filter(({ id, collaborator }) => 
+                id.toLowerCase().includes(searchValue) ||
+                collaborator.name.toLowerCase().includes(searchValue)
+            );
+            renderTable(filteredData);
+        }
+    });
+
+    loadSearchHistory();
+</script>
