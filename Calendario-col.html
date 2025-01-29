@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario Laboral</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .calendar-header {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .week-day, .day {
+            display: inline-block;
+            width: 13%;
+            text-align: center;
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin: 2px;
+            position: relative;
+        }
+        .current-day {
+            background-color: #007bff;
+            color: white;
+        }
+        .icon-btn {
+            margin-left: 5px;
+            cursor: pointer;
+        }
+        .login-alert, .notification {
+            background-color: #f44336;
+            color: white;
+            padding: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            border-radius: 5px;
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        #viewForm, #collaboratorForm {
+            display: none;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        #viewForm {
+            max-width: 400px;
+            margin: auto;
+            background: #e0f7fa;
+            border: 1px solid #00796b;
+        }
+        #viewCollaborators div {
+            margin: 5px 0;
+        }
+        .alert-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 300px;
+            z-index: 1000;
+        }
+        .alert-box {
+            background-color: #ffcc00;
+            color: #000;
+            padding: 15px;
+            margin: 5px 0;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.5s;
+        }
+    </style>
+</head>
+<body>
+    <div id="calendar"></div>
+
+    <div id="viewForm">
+        <div id="viewCollaborators"></div>
+        <button id="closeViewForm">Cerrar</button>
+    </div>
+
+    <div id="collaboratorForm">
+        <input type="text" id="collaboratorName" placeholder="Nombre del colaborador" required>
+        <input type="text" id="collaboratorId" placeholder="ID del colaborador" required>
+        <input type="text" id="collaboratorArea" placeholder="Área de trabajo" required>
+        <input type="text" id="collaboratorPosition" placeholder="Posición" required>
+        <input type="color" id="collaboratorColor" value="#ffcc00">
+        <select id="collaboratorAction" required>
+            <option value="vacaciones">Vacaciones</option>
+            <option value="libre">Libre</option>
+            <option value="permiso">Permiso</option>
+            <option value="licencia">Licencia Médica</option>
+        </select>
+        <button id="addCollaborator">Agregar Colaborador</button>
+        <button id="closeCollaboratorForm">Cerrar</button>
+    </div>
+
+    <audio id="alertSound" src="https://firebasestorage.googleapis.com/v0/b/formulario-2-8929a.appspot.com/o/audio%2FSD_ALERT_27.mp3?alt=media&token=387de74a-8551-4e83-974c-5f1b8dd27528" preload="auto"></audio>
+    
+    <div class="alert-container" id="alertContainer"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCFfkmEDjqAwJNtnKByRQNt9NUQs5UdNa0",
+            authDomain: "rrhh-ee7e3.firebaseapp.com",
+            projectId: "rrhh-ee7e3",
+            storageBucket: "rrhh-ee7e3.appspot.com",
+            messagingSenderId: "605891607617",
+            appId: "1:605891607617:web:daedbd7b7b5a8b901ac0",
+            measurementId: "G-Q801R9M95S"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth();
+
+        let selectedDay = null;
+        let currentUser = null;
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                console.log('Usuario logueado:', user.email);
+                renderCalendar();
+                setEventAlerts();
+            } else {
+                currentUser = null;
+                showLoginAlert();
+            }
+        });
+
+        function showLoginAlert() {
+            const alertDiv = document.createElement('div');
+            alertDiv.classList.add('login-alert');
+            alertDiv.textContent = '¡Debes iniciar sesión para continuar!';
+            document.body.appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), 3000);
+        }
+
+        function renderCalendar() {
+            const calendarElement = document.getElementById('calendar');
+            calendarElement.innerHTML = '';
+            const date = new Date();
+            const currentMonth = date.getMonth();
+            const currentYear = date.getFullYear();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const monthName = date.toLocaleString('default', { month: 'long' });
+
+            const headerElement = document.createElement('div');
+            headerElement.classList.add('calendar-header');
+            headerElement.textContent = `Calendario de ${monthName} ${currentYear}`;
+            calendarElement.appendChild(headerElement);
+
+            const weekDays = ['D', 'L', 'M', 'X', 'J', 'V', 'S'];
+            weekDays.forEach(day => {
+                const dayElement = document.createElement('div');
+                dayElement.classList.add('week-day');
+                dayElement.textContent = day;
+                calendarElement.appendChild(dayElement);
+            });
+
+            const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+            for (let i = 0; i < firstDayOfMonth; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.classList.add('day');
+                calendarElement.appendChild(emptyCell);
+            }
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayElement = document.createElement('div');
+                dayElement.classList.add('day');
+                dayElement.textContent = i; // Mostrar solo el número del día
+                dayElement.id = `day-${i}`;
+
+                const today = new Date();
+                if (today.getDate() === i && today.getMonth() === currentMonth && today.getFullYear() === currentYear) {
+                    dayElement.classList.add('current-day');
+                }
+
+                getCollaboratorsData(i, dayElement); // Pasar el elemento del día para actualizar su color
+
+                const viewIcon = document.createElement('i');
+                viewIcon.classList.add('fas', 'fa-eye', 'icon-btn');
+                viewIcon.title = "Ver Colaboradores";
+                viewIcon.addEventListener('click', () => openViewForm(i));
+
+                const collaboratorIcon = document.createElement('i');
+                collaboratorIcon.classList.add('fas', 'fa-user-plus', 'icon-btn');
+                collaboratorIcon.title = "Agregar Colaborador";
+                collaboratorIcon.addEventListener('click', openCollaboratorForm);
+
+                dayElement.appendChild(viewIcon);
+                dayElement.appendChild(collaboratorIcon);
+                calendarElement.appendChild(dayElement);
+            }
+        }
+
+        async function getCollaboratorsData(day, dayElement) {
+            if (!currentUser) return;
+
+            const dayDocRef = doc(db, "calendar", `${day}`);
+            const docSnap = await getDoc(dayDocRef);
+
+            if (docSnap.exists()) {
+                const dayData = docSnap.data();
+                
+                // Cambiar el color del día según el primer colaborador
+                if (dayData.collaborators) {
+                    dayData.collaborators.forEach(collab => {
+                        // Cambiar el color del día solo si no ha sido establecido
+                        if (dayElement.style.backgroundColor === "") {
+                            dayElement.style.backgroundColor = collab.color || "#fff";
+                        }
+                    });
+                }
+            }
+        }
+
+        function openViewForm(day) {
+            selectedDay = day;
+            document.getElementById('viewForm').style.display = 'block';
+            loadCollaboratorsDetails(day);
+        }
+
+        async function loadCollaboratorsDetails(day) {
+            const dayDocRef = doc(db, "calendar", `${day}`);
+            const docSnap = await getDoc(dayDocRef);
+            const viewCollaborators = document.getElementById('viewCollaborators');
+            viewCollaborators.innerHTML = ''; // Limpiar contenido previo
+
+            if (docSnap.exists()) {
+                const dayData = docSnap.data();
+                if (dayData.collaborators) {
+                    dayData.collaborators.forEach(collab => {
+                        const collabElement = document.createElement('div');
+                        collabElement.style.color = collab.color || "#000";
+                        collabElement.textContent = `${collab.name} - ${collab.action} | Área: ${collab.area} | Posición: ${collab.position}`;
+                        viewCollaborators.appendChild(collabElement);
+                    });
+                } else {
+                    viewCollaborators.textContent = "No hay colaboradores para este día.";
+                }
+            } else {
+                viewCollaborators.textContent = "No hay datos para este día.";
+            }
+        }
+
+        document.getElementById('closeViewForm').addEventListener('click', () => {
+            document.getElementById('viewForm').style.display = 'none';
+        });
+
+        function openCollaboratorForm() {
+            document.getElementById('collaboratorForm').style.display = 'block';
+        }
+
+        document.getElementById('addCollaborator').addEventListener('click', async () => {
+            const collaboratorName = document.getElementById('collaboratorName').value;
+            const collaboratorId = document.getElementById('collaboratorId').value;
+            const collaboratorArea = document.getElementById('collaboratorArea').value;
+            const collaboratorPosition = document.getElementById('collaboratorPosition').value;
+            const collaboratorColor = document.getElementById('collaboratorColor').value;
+            const action = document.getElementById('collaboratorAction').value;
+
+            if (collaboratorName && collaboratorId) {
+                // Obtener la referencia del día seleccionado
+                const dayDocRef = doc(db, "calendar", `${selectedDay}`);
+
+                // Obtener los datos existentes
+                const docSnap = await getDoc(dayDocRef);
+                let collaborators = [];
+
+                if (docSnap.exists()) {
+                    collaborators = docSnap.data().collaborators || [];
+                }
+
+                // Agregar el nuevo colaborador
+                collaborators.push({ 
+                    name: collaboratorName, 
+                    area: collaboratorArea, 
+                    position: collaboratorPosition,
+                    color: collaboratorColor, 
+                    action: action 
+                });
+
+                // Guardar los datos actualizados
+                await setDoc(dayDocRef, {
+                    collaborators: collaborators,
+                    userId: currentUser.uid
+                }, { merge: true }); // Merge para agregar sin borrar otros datos
+
+                showNotification(`Colaborador ${collaboratorName} agregado con éxito.`);
+                document.getElementById('collaboratorForm').reset();
+                closeCollaboratorForm();
+                renderCalendar(); // Actualizar el calendario después de agregar
+            }
+        });
+
+        document.getElementById('closeCollaboratorForm').addEventListener('click', () => {
+            document.getElementById('collaboratorForm').style.display = 'none';
+        });
+
+        function showNotification(message) {
+            const notificationDiv = document.createElement('div');
+            notificationDiv.classList.add('notification');
+            notificationDiv.textContent = message;
+            document.body.appendChild(notificationDiv);
+            setTimeout(() => notificationDiv.remove(), 3000);
+        }
+
+        function setEventAlerts() {
+            const today = new Date();
+            const alertDays = 5; // Días antes de la alerta
+            const alerts = []; // Para almacenar alertas programadas
+
+            for (let i = 1; i <= 31; i++) {
+                const eventDate = new Date(today.getFullYear(), today.getMonth(), i);
+                if (eventDate >= today && eventDate <= new Date(today.getFullYear(), today.getMonth() + 1, 0)) {
+                    const dayDocRef = doc(db, "calendar", `${i}`);
+                    getDoc(dayDocRef).then(docSnap => {
+                        if (docSnap.exists() && docSnap.data().collaborators) {
+                            const collaborators = docSnap.data().collaborators;
+                            const collaboratorDetails = collaborators.map(collab => `${collab.name} - ${collab.action}`).join(', ');
+                            if (eventDate.getTime() - today.getTime() <= alertDays * 24 * 60 * 60 * 1000) {
+                                alerts.push(`¡Recordatorio! El ${i} de ${eventDate.toLocaleString('default', { month: 'long' })}: ${collaboratorDetails}`);
+                                // Reproducir sonido
+                                document.getElementById('alertSound').play();
+                            }
+                        }
+                    });
+                }
+            }
+
+            // Mostrar las alertas acumuladas una vez que se hayan recuperado todas
+            setTimeout(() => {
+                if (alerts.length > 0) {
+                    showAlerts(alerts);
+                }
+            }, 1000);
+        }
+
+        function showAlerts(alerts) {
+            const alertContainer = document.getElementById('alertContainer');
+            alerts.forEach(alert => {
+                const alertBox = document.createElement('div');
+                alertBox.classList.add('alert-box');
+                alertBox.textContent = alert;
+                alertContainer.appendChild(alertBox);
+                
+                // Desaparecer la alerta después de 5 segundos
+                setTimeout(() => {
+                    alertBox.remove();
+                }, 5000);
+            });
+        }
+    </script>
+</body>
+</html>
