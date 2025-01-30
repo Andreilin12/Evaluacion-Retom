@@ -369,3 +369,82 @@
     </script>
 </body>
 </html>
+
+
+
+<script>
+
+    // Configuración de Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyCFfkmEDjqAwJNtnKByRQNt9NUQs5UdNa0",
+            authDomain: "rrhh-ee7e3.firebaseapp.com",
+            projectId: "rrhh-ee7e3",
+            storageBucket: "rrhh-ee7e3.appspot.com",
+            messagingSenderId: "605891607617",
+            appId: "1:605891607617:web:daedbd7b7b5a8b901ac0",
+            measurementId: "G-Q801R9M95S"
+        };
+
+// Inicializar Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const database = firebase.database();
+
+// Función para iniciar sesión
+function login(email, password) {
+    return auth.signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            const user = userCredential.user;
+            loadUserData(user.uid);
+            return user;
+        })
+        .catch((error) => {
+            console.error("Error de autenticación:", error);
+            throw error;
+        });
+}
+
+// Función para cerrar sesión
+function logout() {
+    return auth.signOut().then(() => {
+        console.log("Usuario desconectado");
+    });
+}
+
+// Función para guardar datos del usuario
+function saveUserData(data) {
+    const user = auth.currentUser;
+    if (user) {
+        return database.ref('userData/' + user.uid).push({
+            data: data,
+            timestamp: Date.now()
+        });
+    } else {
+        throw new Error("Usuario no autenticado");
+    }
+}
+
+// Función para cargar datos del usuario
+function loadUserData(userId) {
+    database.ref('userData/' + userId).on('value', (snapshot) => {
+        const dataList = [];
+        snapshot.forEach((childSnapshot) => {
+            const data = childSnapshot.val();
+            dataList.push({ data: data.data, timestamp: data.timestamp });
+        });
+        console.log("Datos del usuario:", dataList);
+        return dataList; // Puedes adaptar esto para mostrar en la UI
+    });
+}
+
+// Monitorear el estado de autenticación
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        console.log("Usuario autenticado:", user.uid);
+        loadUserData(user.uid);
+    } else {
+        console.log("No hay usuario autenticado");
+    }
+});
+
+</script>
